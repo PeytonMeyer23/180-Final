@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Base{% endblock %}</title>
+   <link rel="stylesheet" href="../static/style.css">
+
+</head>
+<body>
+    <header>
+        <h1>MV Ecommerce</h1>
+        {% block nav %}
+        {% endblock %}
+        <hr>
+    </header>
+    {% block body %}
+    {% endblock %}
+    <main></main>
+    <hr>
+    <footer class="footer">
+        <div class="footercontainer">
+          <div class="footeraddr">
+            <h1>Copyright © P. K. Fernandez</h1>
+          </div>
+          {% block a %}<a href="/adminLogin.html" class="footer__admin-signin">Admin Sign in</a>{% endblock %}
+      </footer>
+</body>
+</html>
