@@ -1,9 +1,7 @@
-import flask
-from flask import Flask, render_template, request, redirect, url_for, abort, session
+from flask import Flask, render_template, request, redirect
 from sqlalchemy import create_engine, text
 from random import randint
-import sqlite3
-import json
+
 
 app = Flask(__name__)
 
@@ -24,10 +22,11 @@ def create_account():
         name = request.form.get('name')
         username = request.form.get('username')
         password = request.form.get('password')
-        email_address = request.form.get('email_address')
+        email = request.form.get('email')
+        accountType = request.form.get('accountType')
         
         conn.execute(text(
-            'INSERT INTO accounts (name, userName, email, phone_number, password) VALUES (name, :username, :email_address, :password)'),
+            'INSERT INTO accounts (name, username, password, email) VALUES (name, :username, :password, :email)'),
             {'name': name, 'username': username, 'email': email, 'password': password})
         conn.commit()
         return render_template("register.html")
@@ -38,5 +37,14 @@ def create_account():
 def get_products():
     products = conn.execute(text("SELECT * FROM product")).fetchall()
     return render_template("products.html", products=products)
+
+
+# @app.route('/(PAGETITLE)')
+# def add_product():
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)

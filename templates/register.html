@@ -1,15 +1,23 @@
-<style>
-
-</style>
-
-{% extends "base.html" %}
-
-<div class="topBar">
-    <ul class="barItem">
-        <li><a href="/">Home</a></li>
-        <li><a href="/register">Log In</a></li>
-        <li><a href=""></a></li>
-        <li><a href=""></a></li>
-        <li><a href=""></a></li>
-    </ul>
+{% extends 'base.html' %}
+{% block title%}
+    Log in
+{% endblock %}
+{% block nav %}
+<div class="nav-flex">
+    <a href="/">My Account</a>
+    <a href="/">Log In</a>
 </div>
+{% endblock %}
+{% block body %}
+
+<div class="body">
+    <form action="/create_acc" method="POST">
+        <input type="text" name="name" placeholder="first_name" class="input_field"> <br>
+        <input type="text" name="username" placeholder="username" class="input_field"> <br>
+        <input type="text" name="email" placeholder="address" class="input_field"> <br>
+        <input type="text" name="password" placeholder="password" class="input_field"> <br>
+        <input type="submit" value="Submit" class="input_submit">
+    </form>
+</div>
+
+{% endblock %}
