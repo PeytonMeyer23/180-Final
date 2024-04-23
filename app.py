@@ -74,7 +74,7 @@ def signout():
     
 
 @app.route('/cart', methods=['GET', 'POST'])
-def add_to_cart():
+def cart():
     if request.method == 'POST':
         productIDD = request.form.get('productID')
         size = request.form.get('size')
