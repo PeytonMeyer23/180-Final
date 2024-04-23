@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, session
 from sqlalchemy import create_engine, text
 from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
+from random import randint
 
 
 app = Flask(__name__)
-conn_str = 'mysql://root:cset155localhost/ecommerce'
+
+conn_str = "mysql://root:9866@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
@@ -34,6 +36,11 @@ def create_account():
         return render_template("register.html")
     else:
         return render_template("register.html")
+
+@app.route('/products')
+def get_products():
+    products = conn.execute(text("SELECT * FROM product")).fetchall()
+    return render_template("products.html", products=products)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -75,7 +82,6 @@ def logout():
 #     x = request.form['type']
 #     account_info = conn.execute(text(f"SELECT * FROM users WHERE type = :type"), {'type': x}).fetchall()
 #     return render_template('filter.html', info_type=account_info)
-
 
         # user = request.form.get('user')
         # session["user"] = user
