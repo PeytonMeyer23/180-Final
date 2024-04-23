@@ -29,6 +29,12 @@ def create_account():
         accountType = request.form.get('accountType')
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         
+        cursor = conn.execute(f"SELECT * FROM User WHERE email = '{email}'")
+        existing_user = cursor.fetchone()
+        if existing_user:
+            error_message = "Email already exists. Please use a different email."
+            return render_template('register.html', error_message=error_message)
+        
         conn.execute(text(
             'INSERT INTO user (name, username, password, email, accountType) VALUES (:name, :username, :password, :email, :accountType)'),
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
@@ -36,12 +42,6 @@ def create_account():
         return render_template("register.html")
     else:
         return render_template("register.html")
-
-@app.route('/products')
-def get_products():
-    products = conn.execute(text("SELECT * FROM product")).fetchall()
-    return render_template("products.html", products=products)
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -68,6 +68,12 @@ def login():
 def logout():
     if request.method == 'POST':
         session.clear()
+
+# vendor
+@app.route('/products')
+def get_products():
+    products = conn.execute(text("SELECT * FROM product")).fetchall()
+    return render_template("products.html", products=products)
 
 
 
