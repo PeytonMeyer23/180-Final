@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 from sqlalchemy import create_engine, text
 from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
-from random import randint
-
 
 app = Flask(__name__)
 
@@ -12,7 +10,6 @@ conn = engine.connect()
 app.secret_key = 'hello'
 bcrypt = Bcrypt(app)
 
- 
 
 @app.route('/')
 def homepage():
@@ -32,7 +29,7 @@ def create_account():
         cursor = conn.execute(f"SELECT * FROM User WHERE email = '{email}'")
         existing_user = cursor.fetchone()
         if existing_user:
-            error_message = "Email already exists. Please use a different email."
+            error_message = "Email already exists."
             return render_template('register.html', error_message=error_message)
         
         conn.execute(text(
@@ -42,6 +39,7 @@ def create_account():
         return render_template("register.html")
     else:
         return render_template("register.html")
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -56,18 +54,34 @@ def login():
             role = result[0]  # role from the result
             session['username_or_email'] = username_or_email
             session['role'] = role
-            return redirect ('register.html') # Replace register.html. Redirect to dashboard or home page.
+            if role == 'vendor':
+                return render_template(vendor.html)
+        elif role == 'user':
+            return render_template(user.html)
+        elif role == 'admin':
+            return render_template(admin.html)
         else:
             error_message = "Invalid username/email or password"
             return render_template('login.html', error_message=error_message)
-
-    return render_template('login.html')
+    # return render_template('login.html')
 
 
 @app.route('/signout', methods=['GET', 'POST'])
-def logout():
+def signout():
     if request.method == 'POST':
         session.clear()
+        return redirect('login')
+    
+
+@app.route('/cart', methods=['GET', 'POST'])
+def add_to_cart():
+    if request.method == 'POST':
+        productIDD = request.form.get('productID')
+        size = request.form.get('size')
+        color = request.form.get('color')
+        quantity = int(request.form.get('quantity', 1))
+        return render_template('cart.html')
+
 
 # vendor
 @app.route('/products')
@@ -78,25 +92,13 @@ def get_products():
 
 
 # filter
-# @app.route('/filter', methods=['GET'])
-# def searches():
-#     return flask.render_template('filter.html', info_type=[])
-
-
 # @app.route('/filter', methods=['POST'])
 # def search_account():
+# if request.method == 'POST':
 #     x = request.form['type']
 #     account_info = conn.execute(text(f"SELECT * FROM users WHERE type = :type"), {'type': x}).fetchall()
 #     return render_template('filter.html', info_type=account_info)
 
-        # user = request.form.get('user')
-        # session["user"] = user
-        # print(session['user'])
-        # password = request.form['password']
-        # if user == 'admin' and password == 'CaptainCommerce':
-        #     return redirect('accounts_page')
-        # else:
-        #     return redirect('login.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
