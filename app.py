@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
@@ -12,7 +12,7 @@ app.secret_key = 'hello'
 def homepage():
     return render_template('base.html')
 
-
+# accounts
 @app.route('/register', methods=['GET','POST'])
 def create_account():
     if request.method == "POST":
@@ -23,21 +23,63 @@ def create_account():
         accountType = request.form.get('accountType')
         
         conn.execute(text(
-            'INSERT INTO accounts (name, username, password, email) VALUES (name, :username, :password, :email)'),
-            {'name': name, 'username': username, 'email': email, 'password': password})
+            'INSERT INTO accounts (name, username, password, email, accountType) VALUES (name, :username, :password, :email, :accountType)'),
+            {'name': name, 'username': username, 'email': email, 'password': password, 'accountType': accountType})
         conn.commit()
         return render_template("register.html")
     else:
         return render_template("register.html")
 
 
-# @app.route('/(PAGETITLE)')
-# def add_product():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username_or_email = request.form['input']
+        password = request.form['password']
+
+        query = (f"SELECT accountType FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
+        result = conn.execute(query, (username_or_email, username_or_email, password)).fetchone()
+
+        if result:
+            role = result[0]  # role from the result
+            session['username_or_email'] = username_or_email
+            session['role'] = role
+            return redirect ('register.html') # Replace register.html. Redirect to dashboard or home page.
+        else:
+            error_message = "Invalid username/email or password"
+            return render_template('login.html', error_message=error_message)
+
+    return render_template('login.html')
+
+
+@app.route('/signout', methods=['GET', 'POST'])
+def logout():
+    if request.method == 'POST':
+        session.clear()
 
 
 
+# filter
+# @app.route('/filter', methods=['GET'])
+# def searches():
+#     return flask.render_template('filter.html', info_type=[])
 
 
+# @app.route('/filter', methods=['POST'])
+# def search_account():
+#     x = request.form['type']
+#     account_info = conn.execute(text(f"SELECT * FROM users WHERE type = :type"), {'type': x}).fetchall()
+#     return render_template('filter.html', info_type=account_info)
+
+
+        # user = request.form.get('user')
+        # session["user"] = user
+        # print(session['user'])
+        # password = request.form['password']
+        # if user == 'admin' and password == 'CaptainCommerce':
+        #     return redirect('accounts_page')
+        # else:
+        #     return redirect('login.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
