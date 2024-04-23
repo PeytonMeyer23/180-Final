@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 from sqlalchemy import create_engine, text
+from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
 from random import randint
 
 
@@ -9,13 +10,15 @@ conn_str = "mysql://root:9866@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
+bcrypt = Bcrypt(app)
 
+ 
 
 @app.route('/')
 def homepage():
     return render_template('base.html')
 
-# accounts
+# account functionality
 @app.route('/register', methods=['GET','POST'])
 def create_account():
     if request.method == "POST":
@@ -24,10 +27,11 @@ def create_account():
         password = request.form.get('password')
         email = request.form.get('email')
         accountType = request.form.get('accountType')
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         
         conn.execute(text(
-            'INSERT INTO accounts (name, username, password, email, accountType) VALUES (name, :username, :password, :email, :accountType)'),
-            {'name': name, 'username': username, 'email': email, 'password': password, 'accountType': accountType})
+            'INSERT INTO user (name, username, password, email, accountType) VALUES (:name, :username, :password, :email, :accountType)'),
+            {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
         conn.commit()
         return render_template("register.html")
     else:
