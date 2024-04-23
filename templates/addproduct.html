@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title%}
+    Add Product
+{% endblock %}
+{% block nav %}
+
+{% endblock %}
+{% block body %}
+
+<div class="body">
+
+    <form action="/addproduct" method="POST">
+        <input type="text" name="Product ID" placeholder="Product ID" class="input_field"> <br>
+        <input type="text" name="Product Name" placeholder="Product Name" class="input_field"> <br>
+        <input type="text" name="Description" placeholder="Description" class="input_field"> <br>
+        <input type="text" name="Warranty Period" placeholder="Warranty Period" class="input_field"> <br>
+        <input type="text" name="Number Of Items" placeholder="Number of Items" class="input_field"> <br>
+        <input type="text" name="Price" placeholder="Price" class="input_field"> <br>
+        <input type="submit" value="Submit" class="input_submit">
+    </form>
+</div>
+
+
+{% endblock %}

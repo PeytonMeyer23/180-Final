@@ -38,5 +38,11 @@ def create_account():
 def get_products():
     products = conn.execute(text("SELECT * FROM product")).fetchall()
     return render_template("products.html", products=products)
+
+
+@app.route('/addproducts')
+def add_products():
+    return render_template("addproduct.html")
+
 if __name__ == '__main__':
     app.run(debug=True)
