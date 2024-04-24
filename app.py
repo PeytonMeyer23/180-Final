@@ -4,7 +4,7 @@ from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:9866@localhost/ecommerce"
+conn_str = "mysql://root:CSET@localhost/ecomerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
@@ -55,11 +55,11 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return render_template(vendor.html)
+                return render_template('vendor.html')
         elif role == 'user':
-            return render_template(user.html)
+            return render_template('user.html')
         elif role == 'admin':
-            return render_template(admin.html)
+            return render_template('admin.html')
         else:
             error_message = "Invalid username/email or password"
             return render_template('login.html', error_message=error_message)
