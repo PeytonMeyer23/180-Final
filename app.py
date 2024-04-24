@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
+
 from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
 # from shop import db, app 
+
 
 app = Flask(__name__)
 
@@ -35,11 +37,51 @@ def create_account():
         
         conn.execute(text(
             'INSERT INTO user (name, username, password, email, accountType) VALUES (:name, :username, :password, :email, :accountType)'),
+
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
+
         conn.commit()
         return render_template("register.html")
     else:
         return render_template("register.html")
+
+@app.route('/products')
+def get_products():
+    products = conn.execute(text("SELECT * FROM product")).fetchall()
+    return render_template("products.html", products=products)
+# @app.route('/(PAGETITLE)')
+# def add_product():
+
+
+@app.route('/addproducts', methods=['GET'])
+def add_products  ():
+    return render_template('addproduct.html')
+
+
+
+@app.route('/addproducts', methods=['POST'])
+def create_product():
+    product_id = request.form.get('Product ID')
+    title = request.form.get('Product Name')
+    description = request.form.get('Description')
+    warranty_period = request.form.get('Warranty Period')
+    number_of_items = request.form.get('Number Of Items')
+    price = request.form.get('Price')
+
+    conn.execute(
+        text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
+             "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
+        {
+            'productID': product_id,
+            'title': title,
+            'description': description,
+            'warrantyPeriod': warranty_period,
+            'numberOfItems': number_of_items,
+            'price': price
+        }
+    )
+    conn.commit()
+    return render_template('products.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
