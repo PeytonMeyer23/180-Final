@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
 from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
+# from shop import db, app 
 
 app = Flask(__name__)
 
@@ -73,14 +74,14 @@ def signout():
         return redirect('login')
     
 
-@app.route('/cart', methods=['GET', 'POST'])
-def cart():
-    if request.method == 'POST':
-        productIDD = request.form.get('productID')
-        size = request.form.get('size')
-        color = request.form.get('color')
-        quantity = int(request.form.get('quantity', 1))
-        return render_template('cart.html')
+# @app.route('/cart', methods=['POST'])
+# def AddCart():
+#     if request.method == 'POST':
+#         productID = request.form.get('productID')
+#         size = request.form.get('size')
+#         color = request.form.get('color')
+#         quantity = int(request.form.get('quantity', 1))
+#         return render_template('cart.html')
 
 
 # vendor
