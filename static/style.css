@@ -11,7 +11,7 @@
   body {
       display: flex;
       flex-direction: column;
-      background-color: #f5eefbba;
+      background-color: #bfdbae;
   }
   
   main {
@@ -19,8 +19,7 @@
   }
   
   header {
-    background: rgb(2,0,36);
-    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,9,120,1) 48%);
+    background: #c700009c;
   }
   
   header h1 {
@@ -29,7 +28,7 @@
     margin-left: 2%;
     display: inline-block;
     margin-bottom: 1% ;
-    color: #f1d8ff;;
+    color: white;
   }
   
   hr {
@@ -53,20 +52,19 @@
   
   .nav-flex a:hover {
     cursor: pointer;
-    color: rgb(239, 169, 228);
+    color: rgb(255, 224, 224);
   }
   
   a{
     text-decoration: none;
-    color: rgb(231,25,240);
+    color: white;
 
   }
   
   .footer {
     padding: 10px 30px 20px 30px;
-    color: #f1d8ff;;
-    background: rgb(2,0,36);
-    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,9,120,1) 48%);
+    color: white;
+    background: #c700009c;
     font-size: small;
     height: 75px;
   }

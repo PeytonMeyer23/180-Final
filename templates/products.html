@@ -6,28 +6,58 @@
 
 {% endblock %}
 {% block body %}
-<style>body {
-    font-family: Arial, sans-serif;
+<style>
+  body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
   }
-  
+
+  .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
   h1 {
-    color: #333;
+      text-align: center;
+      color: #333;
   }
-  
+
   ul {
-    list-style-type: none;
-    padding: 0;
+      list-style-type: none;
+      padding: 0;
   }
-  
+
   li {
-    margin-bottom: 10px;
-  }</style>
-    <h1>Products</h1>
-    <ul>
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      padding: 10px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Products</h1>
+  <ul>
       {% for product in products %}
-        <li>{{ product }}</li>
+          <li>
+              <strong>Product ID:</strong> {{ product['productID'] }}<br>
+              <strong>Product Name:</strong> {{ product['title'] }}<br>
+              <strong>Description:</strong> {{ product['description'] }}<br>
+              <strong>Warranty Period:</strong> {{ product['warrantyPeriod'] }}<br>
+              <strong>Number Of Items:</strong> {{ product['numberOfItems'] }}<br>
+              <strong>Price:</strong> {{ product['price'] }}<br>
+          </li>
       {% endfor %}
-    </ul>
-  </body>
+  </ul>
+</div>
+</body>
 </html>
 {% endblock %}

@@ -1,12 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
 from sqlalchemy import create_engine, text
-<<<<<<< HEAD
-from random import randint
-
-import sqlite3
-import json
-=======
->>>>>>> main
 
 app = Flask(__name__)
 
@@ -50,11 +43,32 @@ def get_products():
 def add_products  ():
     return render_template('addproduct.html')
 
+
+
 @app.route('/addproducts', methods=['POST'])
 def create_product():
-    conn.execute(text("INSERT INTO product VALUES (:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"), request.form)
+    product_id = request.form.get('Product ID')
+    title = request.form.get('Product Name')
+    description = request.form.get('Description')
+    warranty_period = request.form.get('Warranty Period')
+    number_of_items = request.form.get('Number Of Items')
+    price = request.form.get('Price')
+
+    conn.execute(
+        text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
+             "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
+        {
+            'productID': product_id,
+            'title': title,
+            'description': description,
+            'warrantyPeriod': warranty_period,
+            'numberOfItems': number_of_items,
+            'price': price
+        }
+    )
     conn.commit()
     return render_template('products.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
