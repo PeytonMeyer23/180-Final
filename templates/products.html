@@ -3,7 +3,6 @@
     Product
 {% endblock %}
 {% block nav %}
-
 {% endblock %}
 {% block body %}
 <style>
@@ -40,6 +39,11 @@
       padding: 10px;
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   }
+
+  .product-image {
+      max-width: 60px;
+      max-height: 60px;
+  }
 </style>
 </head>
 <body>
@@ -48,6 +52,9 @@
   <ul>
       {% for product in products %}
           <li>
+            {% if product['imageURL'] %}
+                <img src="{{ product['imageURL'] }}" alt="Product Image" class="product-image"><br>
+            {% endif %}
               <strong>Product ID:</strong> {{ product['productID'] }}<br>
               <strong>Product Name:</strong> {{ product['title'] }}<br>
               <strong>Description:</strong> {{ product['description'] }}<br>
