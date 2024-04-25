@@ -46,17 +46,19 @@ def create_account():
         return render_template("register.html")
 
 @app.route('/products')
-def get_products():
-    products = conn.execute(text("SELECT * FROM product")).fetchall()
-    return render_template("products.html", products=products)
-# @app.route('/(PAGETITLE)')
-# def add_product():
+def products():
+    products = conn.execute(
+        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+    ).fetchall()
+    
+    return render_template('products.html', products=products)
+
 
 
 @app.route('/addproducts', methods=['GET'])
 def add_products  ():
     return render_template('addproduct.html')
-
 
 
 @app.route('/addproducts', methods=['POST'])
@@ -67,7 +69,9 @@ def create_product():
     warranty_period = request.form.get('Warranty Period')
     number_of_items = request.form.get('Number Of Items')
     price = request.form.get('Price')
+    image_urls = request.form.getlist('Image URL')  # Get list of image URLs from the form
 
+    # Insert into product table
     conn.execute(
         text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
              "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
@@ -80,8 +84,20 @@ def create_product():
             'price': price
         }
     )
+    
+    # Insert into productimages table for each image URL
+    for url in image_urls:
+        conn.execute(
+            text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
+            {
+                'productID': product_id,
+                'imageURL': url
+            }
+        )
+
     conn.commit()
     return render_template('products.html')
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
