@@ -29,7 +29,7 @@ def create_account():
         accountType = request.form.get('accountType')
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         
-        cursor = conn.execute(f"SELECT * FROM User WHERE email = '{email}'")
+        cursor = conn.execute(text("SELECT * FROM user WHERE email = :email"), {'email': email})
         existing_user = cursor.fetchone()
         if existing_user:
             error_message = "Email already exists."
@@ -41,9 +41,42 @@ def create_account():
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return render_template("register.html")
+        return render_template("login.html")
     else:
         return render_template("register.html")
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username_or_email = request.form['input']
+        password = request.form['password']
+
+        query = text("SELECT accountType FROM user WHERE email = :input OR username = :input AND password = :password")
+        result = conn.execute(query, {'input': username_or_email, 'password': password}).fetchone()
+
+        if result:
+            role = result[0]  # role from the result
+            session['username_or_email'] = username_or_email
+            session['role'] = role
+            if role == 'vendor':
+                return render_template('products.html')
+            elif role == 'user':
+                return render_template('products.html')
+            elif role == 'admin':
+                return render_template('products.html')
+        else:
+            error_message = "Invalid username/email or password"
+            return render_template('login.html', error_message=error_message)
+    return render_template('login.html')
+
+
+@app.route('/signout', methods=['GET', 'POST'])
+def signout():
+    if request.method == 'POST':
+        session.clear()
+        return redirect('login')
+    
 
 @app.route('/products')
 def products():
@@ -97,39 +130,6 @@ def create_product():
 
     conn.commit()
     return render_template('products.html')
-
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username_or_email = request.form['input']
-        password = request.form['password']
-
-        query = (f"SELECT accountType FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
-        result = conn.execute(query, (username_or_email, username_or_email, password)).fetchone()
-
-        if result:
-            role = result[0]  # role from the result
-            session['username_or_email'] = username_or_email
-            session['role'] = role
-            if role == 'vendor':
-                return render_template(products.html)
-        elif role == 'user':
-            return render_template(base.html)
-        elif role == 'admin':
-            return render_template(products.html)
-        else:
-            error_message = "Invalid username/email or password"
-            return render_template('login.html', error_message=error_message)
-    # return render_template('login.html')
-
-
-@app.route('/signout', methods=['GET', 'POST'])
-def signout():
-    if request.method == 'POST':
-        session.clear()
-        return redirect('login')
     
 
 # @app.route('/cart', methods=['POST'])
