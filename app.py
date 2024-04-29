@@ -5,18 +5,20 @@ from werkzeug.security import check_password_hash, generate_password_hash
 # from shop import db, app 
 
 
+
 app = Flask(__name__)
 
-conn_str = "mysql://root:cset155@localhost/ecommerce"
+conn_str = "mysql://root:CSET@localhost/ecomerce"
+
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
-bcrypt = Bcrypt(app)
+#bcrypt = Bcrypt(app)
 
 
 @app.route('/')
 def homepage():
-    return render_template('base.html')
+    return render_template('index.html')
 
 # account functionality
 @app.route('/register', methods=['GET','POST'])
@@ -117,6 +119,16 @@ def products():
     return render_template('products.html', products=products)
 
 
+@app.route('/products_test')
+def test_products():
+    products = conn.execute(
+        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+    ).fetchall()
+    
+    return render_template('product_page_test.html', products=products)
+
+
 
 @app.route('/addproducts', methods=['GET'])
 def add_products  ():
@@ -159,6 +171,39 @@ def create_product():
 
     conn.commit()
     return render_template('products.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username_or_email = request.form['input']
+        password = request.form['password']
+        query = (f"SELECT accountType FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
+        #Username = (f"SELECT userName FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
+        result = conn.execute(query, (username_or_email, username_or_email, password)).fetchone()
+
+        if result:
+            role = result[0]  # role from the result
+            session['username_or_email'] = username_or_email
+            session['role'] = role
+            if role == 'vendor':
+
+                return render_template(products.html)
+        elif role == 'user':
+            return render_template(base.html)
+        elif role == 'admin':
+            return render_template(products.html)
+        else:
+            error_message = "Invalid username/email or password"
+            return render_template('login.html', error_message=error_message)
+    # return render_template('login.html')
+
+
+@app.route('/signout', methods=['GET', 'POST'])
+def signout():
+    if request.method == 'POST':
+        session.clear()
+        return redirect('login')
+
     
 
 # @app.route('/cart', methods=['POST'])
@@ -171,11 +216,11 @@ def create_product():
 #         return render_template('cart.html')
 
 
-# vendor
-@app.route('/products')
-def get_products():
-    products = conn.execute(text("SELECT * FROM product")).fetchall()
-    return render_template("products.html", products=products)
+# # vendor
+# @app.route('/products')
+# def get_products():
+#     products = conn.execute(text("SELECT * FROM product")).fetchall()
+#     return render_template("products.html", products=products)
 
 
 
