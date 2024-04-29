@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title%}
+    TEST PAGE NOT FINAL
+{% endblock %}
+{% block nav %}
+
+{% endblock %}
+{% block body %}
+<script>
+    function showProductDetails(products) {
+        var productDetailsBox = document.getElementById("product-details-box");
+        var productDetails = document.getElementById("product-details");
+
+        // Clear previous product details
+        productDetails.innerHTML = '';
+
+        // Loop through products with the same productID
+        for (var i = 0; i < products.length; i++) {
+            var product = products[i];
+
+            var productImage = document.createElement("img");
+            productImage.src = product.imageURL;
+            productImage.className = "product-image";
+            productDetails.appendChild(productImage);
+
+            var productName = document.createElement("div");
+            productName.innerHTML = "<strong>Product Name:</strong> " + product.title;
+            productDetails.appendChild(productName);
+
+            var productPrice = document.createElement("div");
+            productPrice.innerHTML = "<strong>Price:</strong> " + product.price;
+            productDetails.appendChild(productPrice);
+
+            var productDescription = document.createElement("div");
+            productDescription.innerHTML = "<strong>Description:</strong> " + product.description;
+            productDetails.appendChild(productDescription);
+
+            var addToCartBtn = document.createElement("button");
+            addToCartBtn.className = "add-to-cart-btn";
+            addToCartBtn.innerHTML = "Add to Cart";
+            productDetails.appendChild(addToCartBtn);
+
+            // Add event listener to the Add to Cart button
+            addToCartBtn.addEventListener('click', function() {
+                // Add your add to cart functionality here
+                console.log("Product added to cart: " + product.productID);
+            });
+        }
+
+        // Show product details box
+        productDetailsBox.style.display = "block";
+    }
+
+    function hideProductDetails() {
+        var productDetailsBox = document.getElementById("product-details-box");
+        productDetailsBox.style.display = "none";
+    }
+</script>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+    }
+
+    .product {
+        margin-bottom: 20px;
+    }
+
+    .product-details-box {
+        width: 300px;
+        height: auto;
+        background-color: #fff;
+        border-radius: 15px;
+        display: none;
+        padding: 20px;
+        position: absolute;
+        z-index: 1;
+    }
+
+    .createTest-exit {
+        float: right;
+        border: solid 2px black;
+        padding: 5px;
+        width: 60px;
+        background-color: crimson;
+        color: whitesmoke;
+    }
+
+    .createTest-exit:hover {
+        cursor: pointer;
+    }
+
+    .product-image {
+        max-width: 100px;
+        max-height: 100px;
+        margin-bottom: 10px;
+    }
+
+    .product-description {
+        margin-bottom: 10px;
+    }
+
+    .add-to-cart-btn {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container">
+    <div class="product-list">
+        {% for product in products %}
+        <div class="product">
+            <strong>Product Name:</strong> {{ product['title'] }} <br>
+            <strong>Price:</strong> {{ product['price'] }} <br>
+            <button onclick="showProductDetails({% filter selectattr('productID', 'equalto', product['productID']) %}{{ products }}{% endfilter %})">View Details</button>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div id="product-details-box" class="product-details-box">
+        <button class="createTest-exit" onclick="hideProductDetails()">Close</button>
+        <div id="product-details" class="product-details"></div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,16 +1,20 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
 
+
 from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
+# from shop import db, app 
+
 
 
 app = Flask(__name__)
 
 conn_str = "mysql://root:CSET@localhost/ecomerce"
+
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
-bcrypt = Bcrypt(app)
+#bcrypt = Bcrypt(app)
 
 
 @app.route('/')
@@ -45,17 +49,29 @@ def create_account():
         return render_template("register.html")
 
 @app.route('/products')
-def get_products():
-    products = conn.execute(text("SELECT * FROM product")).fetchall()
-    return render_template("products.html", products=products)
-# @app.route('/(PAGETITLE)')
-# def add_product():
+def products():
+    products = conn.execute(
+        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+    ).fetchall()
+    
+    return render_template('products.html', products=products)
+
+
+@app.route('/products_test')
+def test_products():
+    products = conn.execute(
+        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+    ).fetchall()
+    
+    return render_template('product_page_test.html', products=products)
+
 
 
 @app.route('/addproducts', methods=['GET'])
 def add_products  ():
     return render_template('addproduct.html')
-
 
 
 @app.route('/addproducts', methods=['POST'])
@@ -66,7 +82,9 @@ def create_product():
     warranty_period = request.form.get('Warranty Period')
     number_of_items = request.form.get('Number Of Items')
     price = request.form.get('Price')
+    image_urls = request.form.getlist('Image URL')  # Get list of image URLs from the form
 
+    # Insert into product table
     conn.execute(
         text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
              "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
@@ -79,8 +97,20 @@ def create_product():
             'price': price
         }
     )
+    
+    # Insert into productimages table for each image URL
+    for url in image_urls:
+        conn.execute(
+            text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
+            {
+                'productID': product_id,
+                'imageURL': url
+            }
+        )
+
     conn.commit()
     return render_template('products.html')
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -97,12 +127,12 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return render_template('vendor.html')
+
+                return render_template(products.html)
         elif role == 'user':
-            Username = session['username_or_email']
-            return render_template('user.html', Username ),
+            return render_template(base.html)
         elif role == 'admin':
-            return render_template('admin.html')
+            return render_template(products.html)
         else:
             error_message = "Invalid username/email or password"
             return render_template('login.html', error_message=error_message)
@@ -116,14 +146,14 @@ def signout():
         return redirect('login')
     
 
-@app.route('/cart', methods=['GET', 'POST'])
-def cart():
-    if request.method == 'POST':
-        productIDD = request.form.get('productID')
-        size = request.form.get('size')
-        color = request.form.get('color')
-        quantity = int(request.form.get('quantity', 1))
-        return render_template('cart.html')
+# @app.route('/cart', methods=['POST'])
+# def AddCart():
+#     if request.method == 'POST':
+#         productID = request.form.get('productID')
+#         size = request.form.get('size')
+#         color = request.form.get('color')
+#         quantity = int(request.form.get('quantity', 1))
+#         return render_template('cart.html')
 
 
 # # vendor
