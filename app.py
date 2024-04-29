@@ -9,7 +9,6 @@ conn_str = "mysql://root:CSET@localhost/ecomerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
-#bcrypt = Bcrypt(app)
 
 
 @app.route('/')
