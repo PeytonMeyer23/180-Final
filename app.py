@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from sqlalchemy import create_engine, text
 
-from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
+# from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
 
 
 app = Flask(__name__)
@@ -10,7 +10,7 @@ conn_str = "mysql://root:9866@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
-bcrypt = Bcrypt(app)
+#bcrypt = Bcrypt(app)
 
 
 @app.route('/')
@@ -52,6 +52,16 @@ def products():
     ).fetchall()
     
     return render_template('products.html', products=products)
+
+
+@app.route('/products_test')
+def test_products():
+    products = conn.execute(
+        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+    ).fetchall()
+    
+    return render_template('product_page_test.html', products=products)
 
 
 
