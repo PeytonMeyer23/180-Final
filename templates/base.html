@@ -9,6 +9,32 @@
 </head>
 <body>
 
+   <center><header>
+    <h1>MOM Ecommerce</h1>
+    {% block nav %}
+    {% endblock %}
+    <hr>
+        <div class="topBar">
+          <ul class="barItem">
+              <li><a href="/">Home</a></li>
+              <li><a href="/register">Register</a></li>
+              <li><a href="/login">Login</a></li>
+          </ul>
+      </div>
+</header></center> 
+    {% block body %}
+    {% endblock %}
+    <main></main>
+    <hr>
+    <footer class="footer">
+        <div class="footercontainer">
+          <div class="footeraddr">
+            <h1>Copyright © P. K. Fernandez</h1>
+          </div>
+          {% block a %}<a href="/adminLogin.html" class="footer__admin-signin">Admin Sign in</a>{% endblock %}
+      </footer>
+
+
     <header>
         <div class="header">
             <div class="logo">
