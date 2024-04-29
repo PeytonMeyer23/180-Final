@@ -9,7 +9,8 @@ from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:cset155@localhost/ecommerce"
+conn_str = "mysql://root:CSET@localhost/ecomerce"
+
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
@@ -18,7 +19,7 @@ app.secret_key = 'hello'
 
 @app.route('/')
 def homepage():
-    return render_template('base.html')
+    return render_template('index.html')
 
 # account functionality
 @app.route('/register', methods=['GET','POST'])
@@ -117,8 +118,8 @@ def login():
     if request.method == 'POST':
         username_or_email = request.form['input']
         password = request.form['password']
-
         query = (f"SELECT accountType FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
+        #Username = (f"SELECT userName FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
         result = conn.execute(query, (username_or_email, username_or_email, password)).fetchone()
 
         if result:
@@ -126,6 +127,7 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
+
                 return render_template(products.html)
         elif role == 'user':
             return render_template(base.html)
@@ -154,11 +156,11 @@ def signout():
 #         return render_template('cart.html')
 
 
-# vendor
-@app.route('/products')
-def get_products():
-    products = conn.execute(text("SELECT * FROM product")).fetchall()
-    return render_template("products.html", products=products)
+# # vendor
+# @app.route('/products')
+# def get_products():
+#     products = conn.execute(text("SELECT * FROM product")).fetchall()
+#     return render_template("products.html", products=products)
 
 
 

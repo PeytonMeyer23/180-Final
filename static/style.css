@@ -34,6 +34,33 @@
   hr {
     border: 3px solid rgb(34, 43, 29);
   }
+
+  .container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
   
   .nav {
     display: inline-block;
@@ -103,3 +130,233 @@
     color: rgb(239, 169, 228);
   }
   
+  *{
+    margin: 0px;
+}
+.main-header {
+    background-size:cover;
+    height: 60vh;
+    background-attachment: fixed;
+    padding-top: 60px;
+}
+.main-nav {
+    padding: 5px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: lighter;
+}
+.main-nav ul {
+    margin: 0;
+}
+
+.main-nav li {
+    display: inline;
+    padding: 5px;
+}
+
+.main-nav a {
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid whitesmoke;
+}
+
+.main-nav {
+    padding: 5px;
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: lighter;
+    margin-left: 400px;
+    margin-right: 400px;
+    border: 0px solid black;
+    border-radius: 15%;
+}
+
+
+.main-nav li:hover {
+    background-color: rgb(93, 93, 93);
+}
+
+
+.nav a:hover {
+    background-color: rgba(255, 255, 255, .3)
+}
+.head {
+    background-image: linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url(imageOne.jpg);
+    background-size:cover;
+    height: 100vh;
+    background-attachment: fixed;
+    padding-top: 60px;
+  }
+  .head img{
+    margin:0 0 0 0;
+  }
+
+  .head h2{
+    color: white;
+    font-size: 30px;
+    text-align: center;
+  }
+
+  .section1 h3{
+    text-align: center;
+    padding-top: 50px;
+    font-size: 50px;
+    font-family: impact, fantasy;
+
+  }
+.section3 td{
+    height: 100px;
+    width: 40px;
+    padding:30px;
+}
+
+
+*{
+    margin: 0px;
+}
+.main-header {
+    background-size:cover;
+    height: 60vh;
+    background-attachment: fixed;
+    padding-top: 60px;
+}
+.main-nav {
+    padding: 5px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: lighter;
+}
+.main-nav ul {
+    margin: 0;
+}
+
+.main-nav li {
+    display: inline;
+    padding: 5px;
+}
+
+.main-nav a {
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid whitesmoke;
+}
+
+.main-nav {
+    padding: 5px;
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: lighter;
+    margin-left: 400px;
+    margin-right: 400px;
+    border: 0px solid black;
+    border-radius: 15%;
+}
+
+
+.main-nav li:hover {
+    background-color: rgb(93, 93, 93);
+}
+
+
+.nav a:hover {
+    background-color: rgba(255, 255, 255, .3)
+}
+.head {
+    background-image: linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url(imageOne.jpg);
+    background-size:cover;
+    height: 100vh;
+    background-attachment: fixed;
+    padding-top: 60px;
+  }
+  .head img{
+    margin:0 0 0 0;
+  }
+
+  .head h2{
+    color: white;
+    font-size: 30px;
+    text-align: center;
+  }
+
+  .section1 h3{
+    text-align: center;
+    padding-top: 50px;
+    font-size: 50px;
+    font-family: impact, fantasy;
+
+  }
+.section3 td{
+    height: 100px;
+    width: 40px;
+    padding:30px;
+}
+
+
+footer {
+    content: "";
+    background-color: #2d2d30;
+    text-align: center;
+    height: 90px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+footer th{
+color: #bdbdbd;
+font-size: 30px;    
+padding: 50px;
+}
+
+footer p:hover{
+    text-decoration: underline;
+    cursor:pointer;
+}
+
+
+.header li {
+    padding: 10px;
+    text-decoration: none;
+    float: right;
+}
+.header li:hover {
+    background-color: whitesmoke;
+}
+.header ul {
+    display: inline-flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+}
+
+
+.logo {
+    display: flex;
+    align-items: center;
+
+}
+.logo img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.logo span {
+    font-size: 25px;
+    font-weight: bold;
+    color: #333;
+}
+
+#mom {
+    left: 15px;
+}
