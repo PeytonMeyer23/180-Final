@@ -1,12 +1,15 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
 
-# from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
+
+from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
+# from shop import db, app 
+
 
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:9866@localhost/ecommerce"
+conn_str = "mysql://root:cset155@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
@@ -123,11 +126,11 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return render_template(vendor.html)
+                return render_template(products.html)
         elif role == 'user':
-            return render_template(user.html)
+            return render_template(base.html)
         elif role == 'admin':
-            return render_template(admin.html)
+            return render_template(products.html)
         else:
             error_message = "Invalid username/email or password"
             return render_template('login.html', error_message=error_message)
@@ -141,14 +144,14 @@ def signout():
         return redirect('login')
     
 
-@app.route('/cart', methods=['GET', 'POST'])
-def cart():
-    if request.method == 'POST':
-        productIDD = request.form.get('productID')
-        size = request.form.get('size')
-        color = request.form.get('color')
-        quantity = int(request.form.get('quantity', 1))
-        return render_template('cart.html')
+# @app.route('/cart', methods=['POST'])
+# def AddCart():
+#     if request.method == 'POST':
+#         productID = request.form.get('productID')
+#         size = request.form.get('size')
+#         color = request.form.get('color')
+#         quantity = int(request.form.get('quantity', 1))
+#         return render_template('cart.html')
 
 
 # vendor
