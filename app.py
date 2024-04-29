@@ -15,7 +15,7 @@ bcrypt = Bcrypt(app)
 
 @app.route('/')
 def homepage():
-    return render_template('base.html')
+    return render_template('index.html')
 
 # account functionality
 @app.route('/register', methods=['GET','POST'])
@@ -88,8 +88,8 @@ def login():
     if request.method == 'POST':
         username_or_email = request.form['input']
         password = request.form['password']
-
         query = (f"SELECT accountType FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
+        #Username = (f"SELECT userName FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
         result = conn.execute(query, (username_or_email, username_or_email, password)).fetchone()
 
         if result:
@@ -99,7 +99,8 @@ def login():
             if role == 'vendor':
                 return render_template('vendor.html')
         elif role == 'user':
-            return render_template('user.html')
+            Username = session['username_or_email']
+            return render_template('user.html', Username ),
         elif role == 'admin':
             return render_template('admin.html')
         else:
@@ -125,11 +126,11 @@ def cart():
         return render_template('cart.html')
 
 
-# vendor
-@app.route('/products')
-def get_products():
-    products = conn.execute(text("SELECT * FROM product")).fetchall()
-    return render_template("products.html", products=products)
+# # vendor
+# @app.route('/products')
+# def get_products():
+#     products = conn.execute(text("SELECT * FROM product")).fetchall()
+#     return render_template("products.html", products=products)
 
 
 

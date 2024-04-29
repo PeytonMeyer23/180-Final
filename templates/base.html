@@ -3,27 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Base{% endblock %}</title>
-   <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="style.css">
 
+    <title>Document</title>
 </head>
 <body>
-   <center><header>
-    <h1>MOM Ecommerce</h1>
-    {% block nav %}
-    {% endblock %}
-    <hr>
-</header></center> 
-    {% block body %}
-    {% endblock %}
-    <main></main>
-    <hr>
-    <footer class="footer">
-        <div class="footercontainer">
-          <div class="footeraddr">
-            <h1>Copyright © P. K. Fernandez</h1>
-          </div>
-          {% block a %}<a href="/adminLogin.html" class="footer__admin-signin">Admin Sign in</a>{% endblock %}
-      </footer>
+    <header>
+        <div class="header">
+            <div class="logo">
+                <img src="LogoNoBackground.png" alt="Logo">
+                <span>Mom Eccommerce</span>
+            </div>
+            <ul>
+                <li><a href="/index.html">HOME</a></li>
+                <li><a href="/products.html">Products</a></li>
+                <li><a href="/about.html">ABOUT</a></li>
+            </ul>
+        </div>
+    </header>
+
+{% endblock %}
+{% block body %}
+
+
+    <footer>
+        <table>
+            <center>
+            <tr>
+                <th><p>Site content</p></th>
+                <th><p>Support</p></th>
+                <th><p>Products</p></th>
+                <th><p>About Us</p></th>
+            </tr>
+            </th>
+            </center>
+        </table>
+    </footer>
 </body>
 </html>
