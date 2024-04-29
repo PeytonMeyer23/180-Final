@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:CSET@localhost/ecomerce"
+conn_str = "mysql://root:cset155@localhost/ecommerce"
 
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
