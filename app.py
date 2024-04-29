@@ -1,22 +1,20 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
-from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
 from werkzeug.security import check_password_hash, generate_password_hash
-# from shop import db, app 
-
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:cset155@localhost/ecommerce"
+conn_str = "mysql://root:CSET@localhost/ecomerce"
+
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
-bcrypt = Bcrypt(app)
+#bcrypt = Bcrypt(app)
 
 
 @app.route('/')
 def homepage():
-    return render_template('base.html')
+    return render_template('index.html')
 
 # account functionality
 @app.route('/register', methods=['GET','POST'])
@@ -117,6 +115,16 @@ def products():
     return render_template('products.html', products=products)
 
 
+@app.route('/products_test')
+def test_products():
+    products = conn.execute(
+        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+    ).fetchall()
+    
+    return render_template('product_page_test.html', products=products)
+
+
 
 @app.route('/addproducts', methods=['GET'])
 def add_products  ():
@@ -171,11 +179,11 @@ def create_product():
 #         return render_template('cart.html')
 
 
-# vendor
-@app.route('/products')
-def get_products():
-    products = conn.execute(text("SELECT * FROM product")).fetchall()
-    return render_template("products.html", products=products)
+# # vendor
+# @app.route('/products')
+# def get_products():
+#     products = conn.execute(text("SELECT * FROM product")).fetchall()
+#     return render_template("products.html", products=products)
 
 
 
