@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 conn_str = "mysql://root:cset155@localhost/ecommerce"
 
+
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
