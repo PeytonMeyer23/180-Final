@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
-
 from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
+from werkzeug.security import check_password_hash, generate_password_hash
 # from shop import db, app 
 
 
@@ -27,7 +27,7 @@ def create_account():
         password = request.form.get('password')
         email = request.form.get('email')
         accountType = request.form.get('accountType')
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        hashed_password = generate_password_hash(password)
         
         cursor = conn.execute(text("SELECT * FROM user WHERE email = :email"), {'email': email})
         existing_user = cursor.fetchone()
@@ -41,7 +41,7 @@ def create_account():
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return render_template("login.html")
+        return redirect(url_for("login"))
     else:
         return render_template("register.html")
 
@@ -52,23 +52,52 @@ def login():
         username_or_email = request.form['input']
         password = request.form['password']
 
-        query = text("SELECT accountType FROM user WHERE email = :input OR username = :input AND password = :password")
-        result = conn.execute(query, {'input': username_or_email, 'password': password}).fetchone()
+        query = text("SELECT userName, accountType, password FROM user WHERE (email = :input OR userName = :input)")
+        result = conn.execute(query, {'input': username_or_email}).fetchone()
 
-        if result:
-            role = result[0]  # role from the result
+        if result and check_password_hash(result[2], password):
+            user = result[0]
+            role = result[1]
+            session['user'] = user
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return render_template('products.html')
+                return redirect(url_for("products"))
             elif role == 'user':
-                return render_template('products.html')
+                return redirect(url_for("products"))
             elif role == 'admin':
-                return render_template('products.html')
+                return redirect(url_for("products"))
         else:
             error_message = "Invalid username/email or password"
             return render_template('login.html', error_message=error_message)
     return render_template('login.html')
+
+
+
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         username_or_email = request.form['input']
+#         password = request.form['password']
+
+#         query = text("SELECT accountType FROM user WHERE (email = :input OR userName = :input) AND password = :password")
+#         result = conn.execute(query, {'input': username_or_email, 'password': password}).fetchone()
+
+#         if result:
+#             role = result[0] 
+#             session['username_or_email'] = username_or_email
+#             session['role'] = role
+#             if role == 'vendor':
+#                 return redirect(url_for("products"))
+#             elif role == 'user':
+#                 return redirect(url_for("products"))
+#             elif role == 'admin':
+#                 return redirect(url_for("products"))
+
+#         else:
+#             error_message = "Invalid username/email or password"
+#             return render_template('login.html', error_message=error_message)
+#     return render_template('login.html')
 
 
 @app.route('/signout', methods=['GET', 'POST'])
