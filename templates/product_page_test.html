@@ -1,22 +1,74 @@
 {% extends 'base.html' %}
 {% block title%}
-    TEST PAGE NOT FINAL
+    Product
 {% endblock %}
 {% block nav %}
-
 {% endblock %}
 {% block body %}
-<script>
-    function showProductDetails(products) {
-        var productDetailsBox = document.getElementById("product-details-box");
-        var productDetails = document.getElementById("product-details");
+    <style>
+             .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-gap: 10px;
+        }
 
-        // Clear previous product details
-        productDetails.innerHTML = '';
+        .product {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
 
-        // Loop through products with the same productID
-        for (var i = 0; i < products.length; i++) {
-            var product = products[i];
+        .product-image {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-details-box {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #fff;
+            border-left: 1px solid #ccc;
+            box-sizing: border-box;
+            padding: 10px;
+            display: none;
+        }
+
+        .product-details {
+            margin-bottom: 10px;
+        }
+
+        .add-to-cart-btn {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% for product in products %}
+        <div class="product">
+            <img src="{{ product['imageURL'] }}" alt="Product Image" class="product-image">
+            <h2>{{ product['title'] }}</h2>
+            <p>{{ product['price'] }}</p>
+            <button onclick="showProductDetails({{ product._mapping }})">View Details</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="product-details-box" class="product-details-box">
+        <button class="createTest-exit" onclick="hideProductDetails()">Close</button>
+        <div id="product-details" class="product-details"></div>
+    </div>
+
+    <script>
+        function showProductDetails(product) {
+            var productDetailsBox = document.getElementById("product-details-box");
+            var productDetails = document.getElementById("product-details");
+
+            productDetails.innerHTML = '';
 
             var productImage = document.createElement("img");
             productImage.src = product.imageURL;
@@ -40,100 +92,18 @@
             addToCartBtn.innerHTML = "Add to Cart";
             productDetails.appendChild(addToCartBtn);
 
-            // Add event listener to the Add to Cart button
             addToCartBtn.addEventListener('click', function() {
-                // Add your add to cart functionality here
+                // Add cart functionality here
                 console.log("Product added to cart: " + product.productID);
             });
+
+            // Show product details box
+            productDetailsBox.style.display = "block";
         }
 
-        // Show product details box
-        productDetailsBox.style.display = "block";
-    }
-
-    function hideProductDetails() {
-        var productDetailsBox = document.getElementById("product-details-box");
-        productDetailsBox.style.display = "none";
-    }
-</script>
-
-<style>
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        width: 100%;
-    }
-
-    .product {
-        margin-bottom: 20px;
-    }
-
-    .product-details-box {
-        width: 300px;
-        height: auto;
-        background-color: #fff;
-        border-radius: 15px;
-        display: none;
-        padding: 20px;
-        position: absolute;
-        z-index: 1;
-    }
-
-    .createTest-exit {
-        float: right;
-        border: solid 2px black;
-        padding: 5px;
-        width: 60px;
-        background-color: crimson;
-        color: whitesmoke;
-    }
-
-    .createTest-exit:hover {
-        cursor: pointer;
-    }
-
-    .product-image {
-        max-width: 100px;
-        max-height: 100px;
-        margin-bottom: 10px;
-    }
-
-    .product-description {
-        margin-bottom: 10px;
-    }
-
-    .add-to-cart-btn {
-        background-color: #4CAF50;
-        border: none;
-        color: white;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-</style>
-
-<div class="container">
-    <div class="product-list">
-        {% for product in products %}
-        <div class="product">
-            <strong>Product Name:</strong> {{ product['title'] }} <br>
-            <strong>Price:</strong> {{ product['price'] }} <br>
-            <button onclick="showProductDetails({% filter selectattr('productID', 'equalto', product['productID']) %}{{ products }}{% endfilter %})">View Details</button>
-        </div>
-        {% endfor %}
-    </div>
-    
-    <div id="product-details-box" class="product-details-box">
-        <button class="createTest-exit" onclick="hideProductDetails()">Close</button>
-        <div id="product-details" class="product-details"></div>
-    </div>
-</div>
-
-{% endblock %}
+        function hideProductDetails() {
+            var productDetailsBox = document.getElementById("product-details-box");
+            productDetailsBox.style.display = "none";
+        }
+    </script>
+    {% endblock %}
