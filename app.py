@@ -71,33 +71,6 @@ def login():
     return render_template('login.html')
 
 
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         username_or_email = request.form['input']
-#         password = request.form['password']
-
-#         query = text("SELECT accountType FROM user WHERE (email = :input OR userName = :input) AND password = :password")
-#         result = conn.execute(query, {'input': username_or_email, 'password': password}).fetchone()
-
-#         if result:
-#             role = result[0] 
-#             session['username_or_email'] = username_or_email
-#             session['role'] = role
-#             if role == 'vendor':
-#                 return redirect(url_for("products"))
-#             elif role == 'user':
-#                 return redirect(url_for("products"))
-#             elif role == 'admin':
-#                 return redirect(url_for("products"))
-
-#         else:
-#             error_message = "Invalid username/email or password"
-#             return render_template('login.html', error_message=error_message)
-#     return render_template('login.html')
-
-
 @app.route('/signout', methods=['GET', 'POST'])
 def signout():
     if request.method == 'POST':
