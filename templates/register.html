@@ -13,16 +13,17 @@
 <div class="body">
     <form action="/register" method="POST">
         <input type="text" name="name" placeholder="First and last name" class="input_field"> <br>
+        <input type="text" name="address" placeholder="Address" class="input_field"> <br>
         <input type="text" name="username" placeholder="Username" class="input_field"> <br>
-        <input type="text" name="email" placeholder="Address" class="input_field"> <br>
         <input type="text" name="password" placeholder="Password" class="input_field"> <br>
         <select name="accountType" id="roles">
             <option value="">Select your role</option>
             <option value="user">user</option>
             <option value="vendor">vendor</option>
             <option value="admin">admin</option>
-            </select>
-        <input type="submit" value="Submit" class="input_submit">
+            </select><br>
+        <input type="submit" value="Register" class="input_submit"> <br>
+        <a href="/login.html">Already have an account? Log in</a>
     </form>
 </div>
 

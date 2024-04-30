@@ -6,20 +6,24 @@
     <title>Document</title>
 </head>
 <body>
-    <ul>
-        {% block body %}
-        {% block body %}
-        {% for product in products %}
-            <li>
-                <strong>Product ID:</strong> {{ product['productID'] }}<br>
-                <strong>Product Name:</strong> {{ product['title'] }}<br>
-                <strong>Description:</strong> {{ product['description'] }}<br>
-                <strong>Warranty Period:</strong> {{ product['warrantyPeriod'] }}<br>
-                <strong>Number Of Items:</strong> {{ product['numberOfItems'] }}<br>
-                <strong>Price:</strong> {{ product['price'] }}<br>
-            </li>
-        {% endfor %}
-        {% endblock %}
-    </ul>
+<div class="container">
+  <h1>Products</h1>
+  <ul>
+      {% for product in products %}
+          <li>
+            {% if product['imageURL'] %}
+            <img src="{{ product['imageURL'] }}" alt="Product Image" class="product-image"><br>
+        {% endif %}
+              <strong>Product ID:</strong> {{ product['productID'] }}<br>
+              <strong>Product Name:</strong> {{ product['title'] }}<br>
+              <strong>Description:</strong> {{ product['description'] }}<br>
+              <strong>Warranty Period:</strong> {{ product['warrantyPeriod'] }}<br>
+              <strong>Number Of Items:</strong> {{ product['numberOfItems'] }}<br>
+              <strong>Price:</strong> {{ product['price'] }}<br>
+          </li>
+      {% endfor %}
+  </ul>
+</div>
 </body>
 </html>
+{% endblock %}
