@@ -1,20 +1,15 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
-
-
-from flask_bcrypt import Bcrypt #pip install Flask-Bcrypt
-# from shop import db, app 
-
-
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:CSET@localhost/ecomerce"
+conn_str = "mysql://root:cset155@localhost/ecommerce"
+
 
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
-#bcrypt = Bcrypt(app)
 
 
 @app.route('/')
@@ -30,9 +25,9 @@ def create_account():
         password = request.form.get('password')
         email = request.form.get('email')
         accountType = request.form.get('accountType')
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        hashed_password = generate_password_hash(password)
         
-        cursor = conn.execute(f"SELECT * FROM User WHERE email = '{email}'")
+        cursor = conn.execute(text("SELECT * FROM user WHERE email = :email"), {'email': email})
         existing_user = cursor.fetchone()
         if existing_user:
             error_message = "Email already exists."
@@ -44,9 +39,44 @@ def create_account():
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return render_template("register.html")
+        return redirect(url_for("login"))
     else:
         return render_template("register.html")
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username_or_email = request.form['input']
+        password = request.form['password']
+
+        query = text("SELECT userName, accountType, password FROM user WHERE (email = :input OR userName = :input)")
+        result = conn.execute(query, {'input': username_or_email}).fetchone()
+
+        if result and check_password_hash(result[2], password):
+            user = result[0]
+            role = result[1]
+            session['user'] = user
+            session['username_or_email'] = username_or_email
+            session['role'] = role
+            if role == 'vendor':
+                return redirect(url_for("products"))
+            elif role == 'user':
+                return redirect(url_for("products"))
+            elif role == 'admin':
+                return redirect(url_for("products"))
+        else:
+            error_message = "Invalid username/email or password"
+            return render_template('login.html', error_message=error_message)
+    return render_template('login.html')
+
+
+@app.route('/signout', methods=['GET', 'POST'])
+def signout():
+    if request.method == 'POST':
+        session.clear()
+        return redirect('login')
+    
 
 @app.route('/products')
 def products():
@@ -110,40 +140,6 @@ def create_product():
 
     conn.commit()
     return render_template('products.html')
-
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username_or_email = request.form['input']
-        password = request.form['password']
-        query = (f"SELECT accountType FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
-        #Username = (f"SELECT userName FROM user WHERE username = {username_or_email} OR email = {username_or_email} AND password = {password}")
-        result = conn.execute(query, (username_or_email, username_or_email, password)).fetchone()
-
-        if result:
-            role = result[0]  # role from the result
-            session['username_or_email'] = username_or_email
-            session['role'] = role
-            if role == 'vendor':
-
-                return render_template(products.html)
-        elif role == 'user':
-            return render_template(base.html)
-        elif role == 'admin':
-            return render_template(products.html)
-        else:
-            error_message = "Invalid username/email or password"
-            return render_template('login.html', error_message=error_message)
-    # return render_template('login.html')
-
-
-@app.route('/signout', methods=['GET', 'POST'])
-def signout():
-    if request.method == 'POST':
-        session.clear()
-        return redirect('login')
     
 
 # @app.route('/cart', methods=['POST'])
