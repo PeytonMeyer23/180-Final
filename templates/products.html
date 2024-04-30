@@ -1,50 +1,9 @@
-{% extends 'base.html' %}
-{% block title%}
-    Product
-{% endblock %}
-{% block nav %}
-{% endblock %}
-{% block body %}
-<style>
-  body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f2f2f2;
-  }
-
-  .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-
-  h1 {
-      text-align: center;
-      color: #333;
-  }
-
-  ul {
-      list-style-type: none;
-      padding: 0;
-  }
-
-  li {
-      margin-bottom: 10px;
-      background-color: #f9f9f9;
-      border-radius: 4px;
-      padding: 10px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  }
-
-  .product-image {
-      max-width: 60px;
-      max-height: 60px;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <body>
 <div class="container">
@@ -53,8 +12,8 @@
       {% for product in products %}
           <li>
             {% if product['imageURL'] %}
-                <img src="{{ product['imageURL'] }}" alt="Product Image" class="product-image"><br>
-            {% endif %}
+            <img src="{{ product['imageURL'] }}" alt="Product Image" class="product-image"><br>
+        {% endif %}
               <strong>Product ID:</strong> {{ product['productID'] }}<br>
               <strong>Product Name:</strong> {{ product['title'] }}<br>
               <strong>Description:</strong> {{ product['description'] }}<br>
