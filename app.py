@@ -140,16 +140,6 @@ def create_product():
 
     conn.commit()
     return render_template('products.html')
-    
-
-# @app.route('/cart', methods=['POST'])
-# def AddCart():
-#     if request.method == 'POST':
-#         productID = request.form.get('productID')
-#         size = request.form.get('size')
-#         color = request.form.get('color')
-#         quantity = int(request.form.get('quantity', 1))
-#         return render_template('cart.html')
 
 
 # # vendor
@@ -159,7 +149,6 @@ def create_product():
 #     return render_template("products.html", products=products)
 
 
-
 # filter
 # @app.route('/filter', methods=['POST'])
 # def search_account():
@@ -167,6 +156,35 @@ def create_product():
 #     x = request.form['type']
 #     account_info = conn.execute(text(f"SELECT * FROM users WHERE type = :type"), {'type': x}).fetchall()
 #     return render_template('filter.html', info_type=account_info)
+
+# chat
+@app.route('/chat', methods=['POST','GET'])
+def send_chat():
+     if 'user' in session:
+        current_user = session['user']
+        receiverUserName = request.form['receiverUserNAme']
+        text = request.form['text']
+        imageURL = request.form['imageURL']
+
+        # get vendor 
+        conn.execute("SELECT userName FROM user WHERE userName = :ReceiverUserName AND role = vendor").fetchone()
+        result = conn.execute(query, {'vendor_username': vendor_username}).fetchone()
+        if result:
+            vendor_username = result[0]
+
+        # insert message into SQL
+        query = conn.execute(
+                text("INSERT INTO chat (text, imageURL, writerUserName, receiverUserName) VALUES "
+                    "(:text, :imageURL, :writerUserName, :receiverUserName)"),
+                {
+                    'writerUserName': current_user,
+                    'receiverUserName': receiverUserName,
+                    'text': text,
+                    'imageURL': imageURL
+                }
+            )
+        conn.commit()
+        return "Message sent successfully"
 
 
 if __name__ == '__main__':
