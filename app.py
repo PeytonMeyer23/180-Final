@@ -160,20 +160,21 @@ def create_product():
 # chat
 @app.route('/chat', methods=['POST','GET'])
 def send_chat():
-     if 'user' in session:
-        current_user = session['user']
-        receiverUserName = request.form['receiverUserNAme']
-        text = request.form['text']
-        imageURL = request.form['imageURL']
+     if request.method == 'POST':
+        if 'user' in session:
+            current_user = session['user']
+            receiverUserName = request.form['receiverUserName']
+            text = request.form['text']
+            imageURL = request.form['imageURL']
 
         # get vendor 
-        conn.execute("SELECT userName FROM user WHERE userName = :ReceiverUserName AND role = vendor").fetchone()
+        query = conn.execute("SELECT userName FROM user WHERE userName = :ReceiverUserName AND role = vendor").fetchone()
         result = conn.execute(query, {'vendor_username': vendor_username}).fetchone()
         if result:
-            vendor_username = result[0]
+            vendor_username = result    #[0]
 
         # insert message into SQL
-        query = conn.execute(
+        conn.execute(
                 text("INSERT INTO chat (text, imageURL, writerUserName, receiverUserName) VALUES "
                     "(:text, :imageURL, :writerUserName, :receiverUserName)"),
                 {
