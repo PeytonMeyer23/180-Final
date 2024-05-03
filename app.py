@@ -4,18 +4,43 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:cset155@localhost/ecommerce"
+conn_str = "mysql://root:9866@localhost/ecommerce"
 
 
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
 
+@app.route('/', methods=['GET', 'POST'])
+def test_products():
+    if request.method == 'POST':
+        cart_data = request.get_json()
+        cart_id = cart_data['cartID']
+        product_id = cart_data['productID']
+        size = cart_data['size']
+        color = cart_data['color']
+        
+        # Insert the cart item into the database
+        conn.execute(
+            text("INSERT INTO carthasproduct (cartID, productID, size, color) VALUES (:cart_id, :product_id, :size, :color)"),
+            cart_id=cart_id,
+            product_id=product_id,
+            size=size,
+            color=color
+        )
+        
+        return {'message': 'Cart item added successfully'}
+    
+    else:
+        products = conn.execute(
+            text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+                 "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+        ).fetchall()
+        
+        return render_template('index.html', products=products)
 
-@app.route('/')
-def homepage():
-    return render_template('index.html')
-
+if __name__ == '__main__':
+    app.run(debug=True)
 # account functionality
 @app.route('/register', methods=['GET','POST'])
 def create_account():
@@ -88,14 +113,14 @@ def products():
     return render_template('products.html', products=products)
 
 
-@app.route('/products_test')
-def test_products():
-    products = conn.execute(
-        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
-             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
-    ).fetchall()
+# @app.route('/products_test')
+# def test_products():
+#     products = conn.execute(
+#         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+#              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+#     ).fetchall()
     
-    return render_template('product_page_test.html', products=products)
+#     return render_template('product_page_test.html', products=products)
 
 
 

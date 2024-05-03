@@ -4,45 +4,252 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/style.css">
-
     <title>Document</title>
 </head>
+<body>
 
 <div class='head'>
     <header class="main-header">
         <nav class="main-nav">
-
             <ul>
+
                 <li><a href="/">HOME</a></li>
                 <li><a href="/products">PRODUCTS</a></li>
                 <li><a href="/about">ABOUT</a></li>
                 <li><a href="/register">REGISTER</a></li>
+
             </ul>
             <h2><br>
+                <br>
                 "STOP BEING POOR" - Mr Moneybags
             </h2>
         </nav>
     </header>
-
 </div>
 
+<div class="section1">
+    <h3>Products</h3>
+    <style>
+        .container {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+           grid-gap: 10px;
+       }
 
-    <div class="section1">
-        <h3>Products</h3>
+       .product {
+           border: 1px solid #ccc;
+           padding: 10px;
+           text-align: center;
+       }
+
+       .product-image {
+           width: 100%;
+           height: auto;
+       }
+
+       .product-details-box {
+           position: fixed;
+           top: 0;
+           right: 0;
+           width: 300px;
+           height: 100%;
+           background-color: #fff;
+           border-left: 1px solid #ccc;
+           box-sizing: border-box;
+           padding: 10px;
+           display: none;
+       }
+
+       .product-details {
+           margin-bottom: 10px;
+       }
+
+       .add-to-cart-btn {
+           display: block;
+           margin: 0 auto;
+       }
+   </style>
+</div>
+
+<div class="container">
+    {% for product in products %}
+    <div class="product" data-productid="{{ product.productID }}" data-size="{{ product.size }}" data-color="{{ product.color }}">
+        <img src="{{ product['imageURL'] }}" alt="Product Image" class="product-image">
+        <h2>{{ product['title'] }}</h2>
+        <p>{{ product['price'] }}</p>
+        <button onclick="showProductDetails({{ product._mapping }})">View Details</button>
+        <button onclick="addToCartClicked(event)">Add to Cart</button>
     </div>
+    {% endfor %}
+</div>
 
-<footer>
-    <table>
-        <center>
-        <tr>
-            <th><p>Site content</th>
-            <th><p></p>Support</th>
-            <th><p></p>Products</th>
-            <th><p></p>About US</th>
-        </tr>
-        </th>
-        </center>
-    </table>
-</footer>
+<div class="cart">
+    <div class="cart-items">
+    </div>
+    <div class="cart-total">
+        <strong>Total:</strong>
+        <span class="cart-total-price">$0</span>
+    </div>
+    <button class="btn-purchase">PURCHASE</button>
+</div>
+
+<div id="product-details-box" class="product-details-box">
+    <button class="createTest-exit" onclick="hideProductDetails()">Close</button>
+    <div id="product-details" class="product-details"></div>
+</div>
+
+<script>
+    function showProductDetails(product) {
+        var productDetailsBox = document.getElementById("product-details-box");
+        var productDetails = document.getElementById("product-details");
+
+        productDetails.innerHTML = '';
+
+        var productImage = document.createElement("img");
+        productImage.src = product.imageURL;
+        productImage.className = "product-image";
+        productDetails.appendChild(productImage);
+
+        var productName = document.createElement("div");
+        productName.innerHTML = "<strong>Product Name:</strong> " + product.title;
+        productDetails.appendChild(productName);
+
+        var productPrice = document.createElement("div");
+        productPrice.innerHTML = "<strong>Price:</strong> " + product.price;
+        productDetails.appendChild(productPrice);
+
+        var productDescription = document.createElement("div");
+        productDescription.innerHTML = "<strong>Description:</strong> " + product.description;
+        productDetails.appendChild(productDescription);
+
+        var addToCartBtn = document.createElement("button");
+        addToCartBtn.className = "add-to-cart-btn";
+        addToCartBtn.innerHTML = "Add to Cart";
+        productDetails.appendChild(addToCartBtn);
+
+        addToCartBtn.addEventListener('click', function() {
+            addItemToCart(product.title, product.price, product.productID, product.size, product.color);
+            updateCart();
+        });
+
+        // Show product details box  
+        productDetailsBox.style.display = "block";
+    }
+
+    function hideProductDetails() {
+        var productDetailsBox = document.getElementById("product-details-box");
+        productDetailsBox.style.display = "none";
+    }
+
+    function addToCartClicked(event) {
+        var button = event.target;
+        var shopItem = button.parentElement;
+        var title = shopItem.getElementsByTagName('h2')[0].innerText;
+        var price = shopItem.getElementsByTagName('p')[0].innerText;
+        var productID = shopItem.dataset.productid;
+        var size = shopItem.dataset.size;
+        var color = shopItem.dataset.color;
+        addItemToCart(title, price, productID, size, color);
+        updateCart();
+    }
+
+    function addItemToCart(title, price, productID, size, color) {
+        var cartRow = document.createElement('div');
+        cartRow.classList.add('cart-row');
+        var cartItems = document.getElementsByClassName('cart-items')[0];
+        var cartItemNames = cartItems.getElementsByClassName('title');
+        for (var i = 0; i < cartItemNames.length; i++) {
+            if (cartItemNames[i].innerText == title) {
+                alert('Already added to cart');
+                return;
+            }
+        }
+        var cartRowContents = `
+            <div class="cart-item cart-column">
+                <span class="title">${title}</span>
+            </div>
+            <span class="cart-price cart-column">${price}</span>
+            <div class="cart-quantity cart-column">
+                <input class="cart-quantity-input" type="number" value="1">
+                <button class="btn btn-danger" type="button">REMOVE</button>
+            </div> `;
+        cartRow.innerHTML = cartRowContents;
+        cartItems.append(cartRow);
+        cartRow.getElementsByClassName('btn-danger')[0].addEventListener('click', removeItem);
+        cartRow.getElementsByClassName('cart-quantity-input')[0].addEventListener('change', quantityChanged);
+
+        // Send data to server
+        var product = {
+            title: title,
+            price: price,
+            productID: productID,
+            size: size,
+            color: color
+        };
+
+        fetch('/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(product),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(text => {
+            console.log(text); // Log the response to see what it is
+            // Handle the response here
+            alert('Item added to cart');
+            updateCart();
+        })
+    
+    }
+
+    function updateCart() {
+        var cartItemContainer = document.getElementsByClassName('cart-items')[0];
+        var cartRows = cartItemContainer.getElementsByClassName('cart-row');
+        var total = 0;
+
+        for (var i = 0; i < cartRows.length; i++) {
+            var cartRow = cartRows[i];
+            var priceElement = cartRow.getElementsByClassName('cart-price')[0];
+            var quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0];
+            var price = parseFloat(priceElement.innerText.replace('$', ''));
+            var quantity = quantityElement.value;
+            total = total + (price * quantity);
+        }
+
+        total = Math.round(total * 100) / 100;
+        document.getElementsByClassName('cart-total-price')[0].innerText = '$' + total;
+    }
+
+    function removeItem(event) {
+        var buttonClicked = event.target;
+        buttonClicked.parentElement.parentElement.remove();
+        updateCart();
+    }
+
+    function quantityChanged(event) {
+        updateCart();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var purchaseButton = document.getElementsByClassName('btn-purchase')[0];
+        purchaseButton.addEventListener('click', purchaseClicked);
+    });
+
+    function purchaseClicked() {
+        var cartItems = document.getElementsByClassName('cart-items')[0];
+        while (cartItems.hasChildNodes()) {
+            cartItems.removeChild(cartItems.firstChild);
+        }
+        updateCart();
+    }
+</script>
+
 </body>
 </html>
