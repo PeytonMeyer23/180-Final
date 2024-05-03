@@ -185,7 +185,7 @@ def send_chat():
                 }
             )
         conn.commit()
-        return "Message sent successfully"
+        return render_template('chat.html')
 
 
 if __name__ == '__main__':
