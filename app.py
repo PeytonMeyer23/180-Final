@@ -213,37 +213,5 @@ def chat():
         return render_template('chat.html')
 
 
-# @app.route('/chat', methods=['POST','GET'])
-# def chat():
-#      if request.method == 'POST':
-#         if 'user' in session:
-#             current_user = session['user']
-#             receiverUserName = request.form['receiverUserNAme']
-#             text = request.form['text']
-#             imageURL = request.form['imageURL']
-
-#         # get vendor 
-#         query = conn.execute("SELECT userName FROM user WHERE userName = :ReceiverUserName AND role = vendor").fetchone()
-#         result = conn.execute(query, {'vendor_username': vendor_username}).fetchone()
-#         if result:
-#             vendor_username = result    #[0]
-
-#         # insert message into SQL
-#         conn.execute(
-#                 text("INSERT INTO complaint (text, imageURL, writerUserName, receiverUserName) VALUES "
-#                     "(:text, :imageURL, :writerUserName, :receiverUserName)"),
-#                 {
-#                     'writerUserName': current_user,
-#                     'receiverUserName': receiverUserName,
-#                     'text': text,
-#                     'imageURL': imageURL
-#                 }
-#             )
-#         conn.commit()
-#         return render_template('chat.html')
-#      else:
-#         return render_template('chat.html')
-
-
 if __name__ == '__main__':
     app.run(debug=True)
