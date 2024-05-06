@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:9866@localhost/ecommerce"
+conn_str = "mysql://root:cset155@localhost/ecommerce"
 
 
 engine = create_engine(conn_str, echo = True)
@@ -39,8 +39,8 @@ def test_products():
         
         return render_template('index.html', products=products)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+
 # account functionality
 @app.route('/register', methods=['GET','POST'])
 def create_account():
@@ -87,7 +87,7 @@ def login():
             if role == 'vendor':
                 return redirect(url_for("products"))
             elif role == 'user':
-                return redirect(url_for("products"))
+                return redirect(url_for("chat"))
             elif role == 'admin':
                 return redirect(url_for("products"))
         else:
@@ -122,10 +122,8 @@ def products():
     
 #     return render_template('product_page_test.html', products=products)
 
-
-
 @app.route('/addproducts', methods=['GET'])
-def add_products  ():
+def add_products():
     return render_template('addproduct.html')
 
 
@@ -183,34 +181,68 @@ def create_product():
 #     return render_template('filter.html', info_type=account_info)
 
 # chat
-@app.route('/chat', methods=['POST','GET'])
-def send_chat():
-     if request.method == 'POST':
+@app.route('/chat', methods=['POST', 'GET'])
+def chat():
+    if request.method == 'POST':
         if 'user' in session:
             current_user = session['user']
             receiverUserName = request.form['receiverUserName']
-            text = request.form['text']
+            text_message = request.form['text']
             imageURL = request.form['imageURL']
 
-        # get vendor 
-        query = conn.execute("SELECT userName FROM user WHERE userName = :ReceiverUserName AND role = vendor").fetchone()
-        result = conn.execute(query, {'vendor_username': vendor_username}).fetchone()
-        if result:
-            vendor_username = result    #[0]
+            # get vendor
+            query_text = text("SELECT userName FROM user WHERE userName = :receiverUserName AND accountType = 'vendor'")
+            result = conn.execute(query_text, {'receiverUserName': receiverUserName}).fetchone()
+            if result:
+                vendor_username = result[0]
 
-        # insert message into SQL
-        conn.execute(
-                text("INSERT INTO chat (text, imageURL, writerUserName, receiverUserName) VALUES "
-                    "(:text, :imageURL, :writerUserName, :receiverUserName)"),
+            # insert message into SQL
+            conn.execute(
+                text("INSERT INTO message (text, imageURL, writerUserName, receiverUserName) VALUES "
+                     "(:text, :imageURL, :writerUserName, :receiverUserName)"),
                 {
                     'writerUserName': current_user,
                     'receiverUserName': receiverUserName,
-                    'text': text,
+                    'text': text_message,
                     'imageURL': imageURL
                 }
             )
-        conn.commit()
+            conn.commit()
+            return render_template('chat.html')
+    else:
         return render_template('chat.html')
+
+
+# @app.route('/chat', methods=['POST','GET'])
+# def chat():
+#      if request.method == 'POST':
+#         if 'user' in session:
+#             current_user = session['user']
+#             receiverUserName = request.form['receiverUserNAme']
+#             text = request.form['text']
+#             imageURL = request.form['imageURL']
+
+#         # get vendor 
+#         query = conn.execute("SELECT userName FROM user WHERE userName = :ReceiverUserName AND role = vendor").fetchone()
+#         result = conn.execute(query, {'vendor_username': vendor_username}).fetchone()
+#         if result:
+#             vendor_username = result    #[0]
+
+#         # insert message into SQL
+#         conn.execute(
+#                 text("INSERT INTO complaint (text, imageURL, writerUserName, receiverUserName) VALUES "
+#                     "(:text, :imageURL, :writerUserName, :receiverUserName)"),
+#                 {
+#                     'writerUserName': current_user,
+#                     'receiverUserName': receiverUserName,
+#                     'text': text,
+#                     'imageURL': imageURL
+#                 }
+#             )
+#         conn.commit()
+#         return render_template('chat.html')
+#      else:
+#         return render_template('chat.html')
 
 
 if __name__ == '__main__':
