@@ -85,7 +85,7 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("products"))
+                return redirect(url_for("chat"))
             elif role == 'user':
                 return redirect(url_for("chat"))
             elif role == 'admin':
@@ -211,6 +211,13 @@ def chat():
             return render_template('chat.html')
     else:
         return render_template('chat.html')
+
+
+def show_chat():
+    if request.method == 'POST':
+        current_user = session['user']
+        chats = conn.execute(text('select text, imageURL, writerUserName from message where receiverUserName = :current_user'))
+    return render_template('chat.html', msg=chats)
 
 
 if __name__ == '__main__':
