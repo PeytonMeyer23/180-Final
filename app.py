@@ -12,10 +12,35 @@ engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
 
+@app.route('/', methods=['GET', 'POST'])
+def test_products():
+    if request.method == 'POST':
+        cart_data = request.get_json()
+        cart_id = cart_data['cartID']
+        product_id = cart_data['productID']
+        size = cart_data['size']
+        color = cart_data['color']
+        
+        # Insert the cart item into the database
+        conn.execute(
+            text("INSERT INTO carthasproduct (cartID, productID, size, color) VALUES (:cart_id, :product_id, :size, :color)"),
+            cart_id=cart_id,
+            product_id=product_id,
+            size=size,
+            color=color
+        )
+        
+        return {'message': 'Cart item added successfully'}
+    
+    else:
+        products = conn.execute(
+            text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+                 "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+        ).fetchall()
+        
+        return render_template('index.html', products=products)
 
-@app.route('/')
-def homepage():
-    return render_template('index.html')
+
 
 # account functionality
 @app.route('/register.html', methods=['GET','POST'])
@@ -61,9 +86,9 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("products"))
+                return redirect(url_for("chat"))
             elif role == 'user':
-                return redirect(url_for("products"))
+                return redirect(url_for("chat"))
             elif role == 'admin':
                 return redirect(url_for("products"))
         else:
@@ -89,19 +114,17 @@ def products():
     return render_template('products.html', products=products)
 
 
-@app.route('/products_test')
-def test_products():
-    products = conn.execute(
-        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
-             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
-    ).fetchall()
+# @app.route('/products_test')
+# def test_products():
+#     products = conn.execute(
+#         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+#              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+#     ).fetchall()
     
-    return render_template('product_page_test.html', products=products)
-
-
+#     return render_template('product_page_test.html', products=products)
 
 @app.route('/addproducts', methods=['GET'])
-def add_products  ():
+def add_products():
     return render_template('addproduct.html')
 
 
@@ -170,12 +193,12 @@ def MakeOrder(user, cart_items):
 #         return render_template('cart.html')
 
 
+
 # # vendor
 # @app.route('/products')
 # def get_products():
 #     products = conn.execute(text("SELECT * FROM product")).fetchall()
 #     return render_template("products.html", products=products)
-
 
 
 # filter
@@ -185,6 +208,45 @@ def MakeOrder(user, cart_items):
 #     x = request.form['type']
 #     account_info = conn.execute(text(f"SELECT * FROM users WHERE type = :type"), {'type': x}).fetchall()
 #     return render_template('filter.html', info_type=account_info)
+
+# chat
+@app.route('/chat', methods=['POST', 'GET'])
+def chat():
+    if request.method == 'POST':
+        if 'user' in session:
+            current_user = session['user']
+            receiverUserName = request.form['receiverUserName']
+            text_message = request.form['text']
+            imageURL = request.form['imageURL']
+
+            # get vendor
+            query_text = text("SELECT userName FROM user WHERE userName = :receiverUserName AND accountType = 'vendor'")
+            result = conn.execute(query_text, {'receiverUserName': receiverUserName}).fetchone()
+            if result:
+                vendor_username = result[0]
+
+            # insert message into SQL
+            conn.execute(
+                text("INSERT INTO message (text, imageURL, writerUserName, receiverUserName) VALUES "
+                     "(:text, :imageURL, :writerUserName, :receiverUserName)"),
+                {
+                    'writerUserName': current_user,
+                    'receiverUserName': receiverUserName,
+                    'text': text_message,
+                    'imageURL': imageURL
+                }
+            )
+            conn.commit()
+            return render_template('chat.html')
+    else:
+        return render_template('chat.html')
+
+
+def show_chat():
+    if request.method == 'POST':
+        current_user = session['user']
+        chats = conn.execute(text('select text, imageURL, writerUserName from message where receiverUserName = :current_user'))
+    return render_template('chat.html', msg=chats)
 
 
 if __name__ == '__main__':
