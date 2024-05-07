@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 app = Flask(__name__)
 
-conn_str = "mysql://root:cset155@localhost/ecommerce"
+conn_str = "mysql://root:CSET@localhost/ecomerce"
 
 
 engine = create_engine(conn_str, echo = True)
@@ -42,7 +43,7 @@ def test_products():
 
 
 # account functionality
-@app.route('/register', methods=['GET','POST'])
+@app.route('/register.html', methods=['GET','POST'])
 def create_account():
     if request.method == "POST":
         name = request.form.get('name')
@@ -69,7 +70,7 @@ def create_account():
         return render_template("register.html")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login.html', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username_or_email = request.form['input']
@@ -101,9 +102,9 @@ def signout():
     if request.method == 'POST':
         session.clear()
         return redirect('login')
-    
 
-@app.route('/products')
+
+@app.route('/products.html')
 def products():
     products = conn.execute(
         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
@@ -163,6 +164,34 @@ def create_product():
 
     conn.commit()
     return render_template('products.html')
+
+def MakeOrder(user, cart_items):
+
+    order_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    status = "placed"  
+    placed_by_username = user  
+
+
+    conn.execute(
+        text("INSERT INTO orders (date, status, placedByUserName) VALUES (:date, :status, :placedByUserName)"),
+        {'date': order_date, 'status': status, 'placedByUserName': placed_by_username}
+    )
+    
+
+    order_id = conn.execute(text("SELECT LAST_INSERT_ID()")).fetchone()[0]
+
+
+
+
+# @app.route('/cart', methods=['POST'])
+# def AddCart():
+#     if request.method == 'POST':
+#         productID = request.form.get('productID')
+#         size = request.form.get('size')
+#         color = request.form.get('color')
+#         quantity = int(request.form.get('quantity', 1))
+#         return render_template('cart.html')
+
 
 
 # # vendor
