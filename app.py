@@ -1,10 +1,14 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for,jsonify       
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import uuid
+from datetime import datetime
+
+
 app = Flask(__name__)
 
-conn_str = "mysql://root:cset155@localhost/ecommerce"
+conn_str = "mysql://root:CSET@localhost/ecomerce"
 
 
 engine = create_engine(conn_str, echo = True)
@@ -40,7 +44,6 @@ def test_products():
         return render_template('index.html', products=products)
 
 
-
 # account functionality
 @app.route('/register', methods=['GET','POST'])
 def create_account():
@@ -51,25 +54,24 @@ def create_account():
         email = request.form.get('email')
         accountType = request.form.get('accountType')
         hashed_password = generate_password_hash(password)
-        
+
         cursor = conn.execute(text("SELECT * FROM user WHERE email = :email"), {'email': email})
         existing_user = cursor.fetchone()
         if existing_user:
             error_message = "Email already exists."
             return render_template('register.html', error_message=error_message)
-        
+
         conn.execute(text(
             'INSERT INTO user (name, username, password, email, accountType) VALUES (:name, :username, :password, :email, :accountType)'),
 
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return redirect(url_for("login"))
+        return redirect(url_for("/home.html"))
     else:
         return render_template("register.html")
 
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login.html', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username_or_email = request.form['input']
@@ -101,26 +103,40 @@ def signout():
     if request.method == 'POST':
         session.clear()
         return redirect('login')
-    
 
-@app.route('/products')
+@app.route('/products.html')
 def products():
+    if request.method == 'POST':
+        keyword = request.form['q']
+        query = text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+                     "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID "
+                     "WHERE p.title LIKE :keyword OR p.description LIKE :keyword")
+        products = conn.execute(query, {'keyword': '%' + keyword + '%'}).fetchall()
+    else:
+        products = conn.execute(
+            text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+                 "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+        ).fetchall()
+
+    return render_template('products.html', products=products)
+
+
+
+@app.route('/update-cart', methods=['POST'])
+def update_cart():
+    cart_data = request.get_json()
+    cartID = cart_data['cartID']
+   
+
+
+@app.route('/products_test')
+def test_products2():
     products = conn.execute(
         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
     ).fetchall()
     
-    return render_template('products.html', products=products)
-
-
-# @app.route('/products_test')
-# def test_products():
-#     products = conn.execute(
-#         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
-#              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
-#     ).fetchall()
-    
-#     return render_template('product_page_test.html', products=products)
+    return render_template('product_page_test.html', products=products)
 
 @app.route('/addproducts', methods=['GET'])
 def add_products():
@@ -135,9 +151,8 @@ def create_product():
     warranty_period = request.form.get('Warranty Period')
     number_of_items = request.form.get('Number Of Items')
     price = request.form.get('Price')
-    image_urls = request.form.getlist('Image URL')  # Get list of image URLs from the form
+    image_urls = request.form.getlist('Image URL')  
 
-    # Insert into product table
     conn.execute(
         text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
              "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
@@ -151,7 +166,7 @@ def create_product():
         }
     )
     
-    # Insert into productimages table for each image URL
+  
     for url in image_urls:
         conn.execute(
             text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
@@ -163,6 +178,36 @@ def create_product():
 
     conn.commit()
     return render_template('products.html')
+
+
+@app.route('/order', methods=['GET'])
+def MakeOrder(user, cart_items):
+
+    order_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    status = "placed"  
+    placed_by_username = user
+    conn.execute(
+        text("select * from cart where ")
+    )
+    cartWithProducts = ""
+
+
+    conn.execute(
+        text("INSERT INTO orders (date, status, placedByUserName) VALUES (:date, :status, :placedByUserName)"),
+        {'date': order_date, 'status': status, 'placedByUserName': placed_by_username}
+    )
+    
+
+
+# @app.route('/cart', methods=['POST'])
+# def AddCart():
+#     if request.method == 'POST':
+#         productID = request.form.get('productID')
+#         size = request.form.get('size')
+#         color = request.form.get('color')
+#         quantity = int(request.form.get('quantity', 1))
+#         return render_template('cart.html')
+
 
 
 # # vendor
@@ -243,6 +288,40 @@ def send_message():
     else:
         return render_template('show_chat.html')
 
+
+
+
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    product_id = request.form.get('productID')
+
+    # Generate unique cart ID for the user
+    cart_id = str(uuid.uuid4())
+
+    # Insert into cart table
+    print("Inserting into cart table:", cart_id)
+    conn = engine.connect()
+    conn.execute(
+        text("INSERT INTO cart (cartID) VALUES (:cartID)"),
+        {'cartID': cart_id}
+    )
+
+    # Insert into carthasproduct table
+    print("Inserting into carthasproduct table:", cart_id, product_id)
+    conn.execute(
+        text("INSERT INTO carthasproduct (cartID, productID, size, color) VALUES "
+             "(:cartID, :productID, :size, :color)"),
+        {
+            'cartID': cart_id,
+            'productID': product_id,
+            'size': 1,  # Hardcoded for now
+            'color': 1,  # Hardcoded for now
+        }
+    )
+
+    conn.close()
+
+    return 'Product added to cart successfully'
 
 
 

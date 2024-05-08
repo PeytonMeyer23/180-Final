@@ -1,0 +1,38 @@
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-gap: 10px;
+}
+
+.product {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+}
+
+.product-details-box {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: #fff;
+    border-left: 1px solid #ccc;
+    box-sizing: border-box;
+    padding: 10px;
+    display: none;
+}
+
+.product-details {
+    margin-bottom: 10px;
+}
+
+.add-to-cart-btn {
+    display: block;
+    margin: 0 auto;
+}
