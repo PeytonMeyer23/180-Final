@@ -1,20 +1,19 @@
-<div class="body">
-    <form action="/chat" method="POST">
-        <input type="text" name="receiverUserName" placeholder="Vendor Name" class="input_field"> <br>
-        <input type="text" name="text" placeholder="Type your message here" class="input_field"> <br>
-        <input type="text" name="imageURL" placeholder="Image URL" class="input_field"> <br>
-        <input type="submit" value="Login" class="input_submit">
-    </form>
-</div>
-
-{% block body %}
-<h3>Inbox</h3>
-
-{% for i in msg %}
-<ul>
-    <li>Message: {{ i[0] }} </li>
-    <li>Image: {{ i[1] }} </li>
-    <li>From: {{ i[2] }} </li>
-</ul>
-{% endfor %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chats</title>
+</head>
+<body>
+    <div class="body">
+        <form action="/chat" method="POST">
+            <input type="text" name="receiverUserName" placeholder="Vendor Name" class="input_field"> <br>
+            <input type="text" name="text" placeholder="Type your message here" class="input_field"> <br>
+            <input type="text" name="imageURL" placeholder="Image URL" class="input_field"> <br>
+            <input type="submit" value="Login" class="input_submit">
+        </form>
+        <a href="/show_chat">View your messages</a>
+    </div>
+</body>
+</html>
