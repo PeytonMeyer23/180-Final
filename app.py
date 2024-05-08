@@ -183,6 +183,8 @@ def create_product():
 # chat
 @app.route('/chat', methods=['POST', 'GET'])
 def chat():
+    error_message = None
+    success_message = None
     if request.method == 'POST':
         if 'user' in session:
             current_user = session['user']
@@ -191,27 +193,30 @@ def chat():
             imageURL = request.form['imageURL']
 
             # get vendor
-            query_text = text("SELECT userName FROM user WHERE userName = :receiverUserName AND accountType = 'vendor'")
-            result = conn.execute(query_text, {'receiverUserName': receiverUserName}).fetchone()
-            if result:
-                vendor_username = result[0]
+            if receiverUserName != current_user:
+                query_text = text("SELECT userName FROM user WHERE userName = :receiverUserName AND accountType = 'vendor'")
+                result = conn.execute(query_text, {'receiverUserName': receiverUserName}).fetchone()
+                if result:
+                    vendor_username = result[0]
 
             # insert message into SQL
-            conn.execute(
-                text("INSERT INTO message (text, imageURL, writerUserName, receiverUserName) VALUES "
-                     "(:text, :imageURL, :writerUserName, :receiverUserName)"),
-                {
-                    'writerUserName': current_user,
-                    'receiverUserName': receiverUserName,
-                    'text': text_message,
-                    'imageURL': imageURL
-                }
-            )
-            conn.commit()
-            return render_template('chat.html')
-    else:
-        return render_template('chat.html')
-    
+                conn.execute(
+                    text("INSERT INTO message (text, imageURL, writerUserName, receiverUserName) VALUES "
+                         "(:text, :imageURL, :writerUserName, :receiverUserName)"),
+                    {
+                        'writerUserName': current_user,
+                        'receiverUserName': receiverUserName,
+                        'text': text_message,
+                        'imageURL': imageURL
+                    }
+                )
+                conn.commit()
+                success_message = 'Message sent!'
+            else:
+                error_message = 'You cannot send a message to yourself'
+
+    return render_template('chat.html', error_message=error_message, success_message=success_message)    
+
 
 @app.route('/show_chat', methods=['POST', 'GET'])
 def show_chat():
@@ -234,7 +239,7 @@ def send_message():
     {'current_user': current_user, 'receiverUserName': receiverUserName, 'send_to': send_to}
 )
             conn.commit()
-            return render_template('show_chat.html')
+            return redirect(url_for("chat"))
     else:
         return render_template('show_chat.html')
 
