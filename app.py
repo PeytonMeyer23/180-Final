@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 
 app = Flask(__name__)
-conn_str = "mysql://root:CSET@localhost/ecomerce"
+conn_str = "mysql://root:cset155@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
@@ -67,7 +67,7 @@ def create_account():
         return render_template("register.html")
 
 
-@app.route('/login.html', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username_or_email = request.form['input']
@@ -101,7 +101,7 @@ def signout():
         return redirect('login')
 
 
-@app.route('/products.html')
+@app.route('/products')
 def products():
     if request.method == 'POST':
         keyword = request.form['q']
