@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for,jsonify       
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
+
+import uuid
 from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -39,7 +42,6 @@ def test_products():
         ).fetchall()
         
         return render_template('index.html', products=products)
-
 
 
 # account functionality
@@ -103,25 +105,39 @@ def signout():
         session.clear()
         return redirect('login')
 
-
 @app.route('/products.html')
 def products():
+    if request.method == 'POST':
+        keyword = request.form['q']
+        query = text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+                     "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID "
+                     "WHERE p.title LIKE :keyword OR p.description LIKE :keyword")
+        products = conn.execute(query, {'keyword': '%' + keyword + '%'}).fetchall()
+    else:
+        products = conn.execute(
+            text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+                 "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+        ).fetchall()
+
+    return render_template('products.html', products=products)
+
+
+
+@app.route('/update-cart', methods=['POST'])
+def update_cart():
+    cart_data = request.get_json()
+    cartID = cart_data['cartID']
+   
+
+
+@app.route('/products_test')
+def test_products2():
     products = conn.execute(
         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
     ).fetchall()
     
-    return render_template('products.html', products=products)
-
-
-# @app.route('/products_test')
-# def test_products():
-#     products = conn.execute(
-#         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
-#              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
-#     ).fetchall()
-    
-#     return render_template('product_page_test.html', products=products)
+    return render_template('product_page_test.html', products=products)
 
 @app.route('/addproducts', methods=['GET'])
 def add_products():
@@ -267,6 +283,40 @@ def send_message():
     else:
         return render_template('show_chat.html')
 
+
+
+
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    product_id = request.form.get('productID')
+
+    # Generate unique cart ID for the user
+    cart_id = str(uuid.uuid4())
+
+    # Insert into cart table
+    print("Inserting into cart table:", cart_id)
+    conn = engine.connect()
+    conn.execute(
+        text("INSERT INTO cart (cartID) VALUES (:cartID)"),
+        {'cartID': cart_id}
+    )
+
+    # Insert into carthasproduct table
+    print("Inserting into carthasproduct table:", cart_id, product_id)
+    conn.execute(
+        text("INSERT INTO carthasproduct (cartID, productID, size, color) VALUES "
+             "(:cartID, :productID, :size, :color)"),
+        {
+            'cartID': cart_id,
+            'productID': product_id,
+            'size': 1,  # Hardcoded for now
+            'color': 1,  # Hardcoded for now
+        }
+    )
+
+    conn.close()
+
+    return 'Product added to cart successfully'
 
 
 
