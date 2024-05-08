@@ -240,13 +240,34 @@ def chat():
             return render_template('chat.html')
     else:
         return render_template('chat.html')
+    
 
-
+@app.route('/show_chat', methods=['POST', 'GET'])
 def show_chat():
-    if request.method == 'POST':
+    if request.method == 'GET':
         current_user = session['user']
-        chats = conn.execute(text('select text, imageURL, writerUserName from message where receiverUserName = :current_user'))
-    return render_template('chat.html', msg=chats)
+        chats = conn.execute(text('SELECT * FROM message WHERE (receiverUserName = :current_user)'), {'current_user': current_user})
+        return render_template('show_chat.html', show_chats=chats)
+    return render_template('show_chat.html', show_chats=[])
+
+
+@app.route('/reply', methods=['POST', 'GET'])
+def send_message():
+    if request.method == 'POST':
+        if 'user' in session:
+            current_user = session['user']
+            send_to = request.form['reply']
+            receiverUserName = request.form['receiverUserName']
+            conn.execute(
+    text('INSERT INTO message (writerUserName, receiverUserName, text) VALUES (:current_user, :receiverUserName, :send_to)'),
+    {'current_user': current_user, 'receiverUserName': receiverUserName, 'send_to': send_to}
+)
+            conn.commit()
+            return render_template('show_chat.html')
+    else:
+        return render_template('show_chat.html')
+
+
 
 
 if __name__ == '__main__':

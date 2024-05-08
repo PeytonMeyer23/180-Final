@@ -1,0 +1,16 @@
+{% block body %}
+{% for i in show_chats %}
+    <ul>
+        <li>Message: {{i[1]}} </li>
+        <li>Image: {{i[2]}} </li>
+        <li>From: {{i[3]}} </li>
+    </ul>
+    <form action="/reply" method="POST">
+        <input type="hidden" name="receiverUserName" value="{{ i[3] }}">
+        <p>Reply:</p>
+        <input type="text" name="reply" placeholder="Type your message here" class="input_field"> <br>
+        <input type="submit" value="Send" class="input_submit">
+    </form>
+{% endfor %}
+
+{% endblock %}
