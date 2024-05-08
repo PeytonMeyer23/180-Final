@@ -45,7 +45,7 @@ def test_products():
 
 
 # account functionality
-@app.route('/register.html', methods=['GET','POST'])
+@app.route('/register', methods=['GET','POST'])
 def create_account():
     if request.method == "POST":
         name = request.form.get('name')
@@ -54,23 +54,22 @@ def create_account():
         email = request.form.get('email')
         accountType = request.form.get('accountType')
         hashed_password = generate_password_hash(password)
-        
+
         cursor = conn.execute(text("SELECT * FROM user WHERE email = :email"), {'email': email})
         existing_user = cursor.fetchone()
         if existing_user:
             error_message = "Email already exists."
             return render_template('register.html', error_message=error_message)
-        
+
         conn.execute(text(
             'INSERT INTO user (name, username, password, email, accountType) VALUES (:name, :username, :password, :email, :accountType)'),
 
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return redirect(url_for("login"))
+        return redirect(url_for("/home.html"))
     else:
         return render_template("register.html")
-
 
 @app.route('/login.html', methods=['GET', 'POST'])
 def login():
@@ -152,9 +151,8 @@ def create_product():
     warranty_period = request.form.get('Warranty Period')
     number_of_items = request.form.get('Number Of Items')
     price = request.form.get('Price')
-    image_urls = request.form.getlist('Image URL')  # Get list of image URLs from the form
+    image_urls = request.form.getlist('Image URL')  
 
-    # Insert into product table
     conn.execute(
         text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
              "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
@@ -168,7 +166,7 @@ def create_product():
         }
     )
     
-    # Insert into productimages table for each image URL
+  
     for url in image_urls:
         conn.execute(
             text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
@@ -181,11 +179,17 @@ def create_product():
     conn.commit()
     return render_template('products.html')
 
+
+@app.route('/order', methods=['GET'])
 def MakeOrder(user, cart_items):
 
     order_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     status = "placed"  
-    placed_by_username = user  
+    placed_by_username = user
+    conn.execute(
+        text("select * from cart where ")
+    )
+    cartWithProducts = ""
 
 
     conn.execute(
@@ -193,10 +197,6 @@ def MakeOrder(user, cart_items):
         {'date': order_date, 'status': status, 'placedByUserName': placed_by_username}
     )
     
-
-    order_id = conn.execute(text("SELECT LAST_INSERT_ID()")).fetchone()[0]
-
-
 
 
 # @app.route('/cart', methods=['POST'])
