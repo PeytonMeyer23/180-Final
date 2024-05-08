@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+{% block nav %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="../static/style.css  ">
 
-
+    /
+    
     <title>Document</title>
 </head>
 <body>
 
    <center><header>
     <h1>MOM Ecommerce</h1>
-    {% block nav %}
-    {% endblock %}
+
     <hr>
         <div class="topBar">
           <ul class="barItem">
@@ -24,9 +24,12 @@
           </ul>
       </div>
 </header></center> 
-    {% block body %}
-    {% endblock %}
-    <main></main>
+{% endblock %}
+
+{% block body %}
+    <main>
+        
+    </main>
     <hr>
     <footer class="footer">
         <div class="footercontainer">
@@ -68,4 +71,5 @@
     </footer>
 
 </body>
+{% endblock %}
 </html>

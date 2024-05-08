@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request, redirect, session, url_for,jsonify       
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
+
 import uuid
+from datetime import datetime
+
+
 app = Flask(__name__)
 
-conn_str = "mysql://root:9866@localhost/ecommerce"
+conn_str = "mysql://root:CSET@localhost/ecomerce"
 
 
 engine = create_engine(conn_str, echo = True)
@@ -39,8 +43,9 @@ def test_products():
         
         return render_template('index.html', products=products)
 
+
 # account functionality
-@app.route('/register', methods=['GET','POST'])
+@app.route('/register.html', methods=['GET','POST'])
 def create_account():
     if request.method == "POST":
         name = request.form.get('name')
@@ -67,7 +72,7 @@ def create_account():
         return render_template("register.html")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login.html', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username_or_email = request.form['input']
@@ -83,9 +88,9 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("products"))
+                return redirect(url_for("chat"))
             elif role == 'user':
-                return redirect(url_for("products"))
+                return redirect(url_for("chat"))
             elif role == 'admin':
                 return redirect(url_for("products"))
         else:
@@ -99,8 +104,8 @@ def signout():
     if request.method == 'POST':
         session.clear()
         return redirect('login')
-    
-@app.route('/products', methods=['GET', 'POST'])
+
+@app.route('/products.html')
 def products():
     if request.method == 'POST':
         keyword = request.form['q']
@@ -134,10 +139,8 @@ def test_products2():
     
     return render_template('product_page_test.html', products=products)
 
-
-
 @app.route('/addproducts', methods=['GET'])
-def add_products  ():
+def add_products():
     return render_template('addproduct.html')
 
 
@@ -178,6 +181,34 @@ def create_product():
     conn.commit()
     return render_template('products.html')
 
+def MakeOrder(user, cart_items):
+
+    order_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    status = "placed"  
+    placed_by_username = user  
+
+
+    conn.execute(
+        text("INSERT INTO orders (date, status, placedByUserName) VALUES (:date, :status, :placedByUserName)"),
+        {'date': order_date, 'status': status, 'placedByUserName': placed_by_username}
+    )
+    
+
+    order_id = conn.execute(text("SELECT LAST_INSERT_ID()")).fetchone()[0]
+
+
+
+
+# @app.route('/cart', methods=['POST'])
+# def AddCart():
+#     if request.method == 'POST':
+#         productID = request.form.get('productID')
+#         size = request.form.get('size')
+#         color = request.form.get('color')
+#         quantity = int(request.form.get('quantity', 1))
+#         return render_template('cart.html')
+
+
 
 # # vendor
 # @app.route('/products')
@@ -195,34 +226,64 @@ def create_product():
 #     return render_template('filter.html', info_type=account_info)
 
 # chat
-@app.route('/chat', methods=['POST','GET'])
-def send_chat():
-     if request.method == 'POST':
+@app.route('/chat', methods=['POST', 'GET'])
+def chat():
+    if request.method == 'POST':
         if 'user' in session:
             current_user = session['user']
             receiverUserName = request.form['receiverUserName']
-            text = request.form['text']
+            text_message = request.form['text']
             imageURL = request.form['imageURL']
 
-        # get vendor 
-        query = conn.execute("SELECT userName FROM user WHERE userName = :ReceiverUserName AND role = vendor").fetchone()
-        result = conn.execute(query, {'vendor_username': vendor_username}).fetchone()
-        if result:
-            vendor_username = result    #[0]
+            # get vendor
+            query_text = text("SELECT userName FROM user WHERE userName = :receiverUserName AND accountType = 'vendor'")
+            result = conn.execute(query_text, {'receiverUserName': receiverUserName}).fetchone()
+            if result:
+                vendor_username = result[0]
 
-        # insert message into SQL
-        conn.execute(
-                text("INSERT INTO chat (text, imageURL, writerUserName, receiverUserName) VALUES "
-                    "(:text, :imageURL, :writerUserName, :receiverUserName)"),
+            # insert message into SQL
+            conn.execute(
+                text("INSERT INTO message (text, imageURL, writerUserName, receiverUserName) VALUES "
+                     "(:text, :imageURL, :writerUserName, :receiverUserName)"),
                 {
                     'writerUserName': current_user,
                     'receiverUserName': receiverUserName,
-                    'text': text,
+                    'text': text_message,
                     'imageURL': imageURL
                 }
             )
-        conn.commit()
+            conn.commit()
+            return render_template('chat.html')
+    else:
         return render_template('chat.html')
+    
+
+@app.route('/show_chat', methods=['POST', 'GET'])
+def show_chat():
+    if request.method == 'GET':
+        current_user = session['user']
+        chats = conn.execute(text('SELECT * FROM message WHERE (receiverUserName = :current_user)'), {'current_user': current_user})
+        return render_template('show_chat.html', show_chats=chats)
+    return render_template('show_chat.html', show_chats=[])
+
+
+@app.route('/reply', methods=['POST', 'GET'])
+def send_message():
+    if request.method == 'POST':
+        if 'user' in session:
+            current_user = session['user']
+            send_to = request.form['reply']
+            receiverUserName = request.form['receiverUserName']
+            conn.execute(
+    text('INSERT INTO message (writerUserName, receiverUserName, text) VALUES (:current_user, :receiverUserName, :send_to)'),
+    {'current_user': current_user, 'receiverUserName': receiverUserName, 'send_to': send_to}
+)
+            conn.commit()
+            return render_template('show_chat.html')
+    else:
+        return render_template('show_chat.html')
+
+
 
 
 @app.route('/add_to_cart', methods=['POST'])
