@@ -1,19 +1,15 @@
 from flask import Flask, render_template, request, redirect, session, url_for,jsonify       
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
-
 import uuid
 from datetime import datetime
 
-
 app = Flask(__name__)
-
-conn_str = "mysql://root:CSET@localhost/ecomerce"
-
-
+conn_str = "mysql://root:cset155@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def test_products():
@@ -43,7 +39,6 @@ def test_products():
         
         return render_template('index.html', products=products)
 
-
 # account functionality
 @app.route('/register', methods=['GET','POST'])
 def create_account():
@@ -71,7 +66,8 @@ def create_account():
     else:
         return render_template("register.html")
 
-@app.route('/login.html', methods=['GET', 'POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username_or_email = request.form['input']
@@ -104,7 +100,8 @@ def signout():
         session.clear()
         return redirect('login')
 
-@app.route('/products.html')
+
+@app.route('/products')
 def products():
     if request.method == 'POST':
         keyword = request.form['q']
@@ -121,12 +118,10 @@ def products():
     return render_template('products.html', products=products)
 
 
-
 @app.route('/update-cart', methods=['POST'])
 def update_cart():
     cart_data = request.get_json()
     cartID = cart_data['cartID']
-   
 
 
 @app.route('/products_test')
@@ -137,6 +132,7 @@ def test_products2():
     ).fetchall()
     
     return render_template('product_page_test.html', products=products)
+
 
 @app.route('/addproducts', methods=['GET'])
 def add_products():
@@ -196,34 +192,6 @@ def MakeOrder(user, cart_items):
         text("INSERT INTO orders (date, status, placedByUserName) VALUES (:date, :status, :placedByUserName)"),
         {'date': order_date, 'status': status, 'placedByUserName': placed_by_username}
     )
-    
-
-
-# @app.route('/cart', methods=['POST'])
-# def AddCart():
-#     if request.method == 'POST':
-#         productID = request.form.get('productID')
-#         size = request.form.get('size')
-#         color = request.form.get('color')
-#         quantity = int(request.form.get('quantity', 1))
-#         return render_template('cart.html')
-
-
-
-# # vendor
-# @app.route('/products')
-# def get_products():
-#     products = conn.execute(text("SELECT * FROM product")).fetchall()
-#     return render_template("products.html", products=products)
-
-
-# filter
-# @app.route('/filter', methods=['POST'])
-# def search_account():
-# if request.method == 'POST':
-#     x = request.form['type']
-#     account_info = conn.execute(text(f"SELECT * FROM users WHERE type = :type"), {'type': x}).fetchall()
-#     return render_template('filter.html', info_type=account_info)
 
 # chat
 @app.route('/chat', methods=['POST', 'GET'])
@@ -289,8 +257,6 @@ def send_message():
         return render_template('show_chat.html')
 
 
-
-
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
     product_id = request.form.get('productID')
@@ -322,7 +288,6 @@ def add_to_cart():
     conn.close()
 
     return 'Product added to cart successfully'
-
 
 
 if __name__ == '__main__':
