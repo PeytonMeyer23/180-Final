@@ -5,7 +5,9 @@ from datetime import datetime
 import uuid
 app = Flask(__name__)
 
-conn_str = "mysql://root:CSET@localhost/ecomerce"
+# conn_str = "mysql://root:CSET@localhost/ecomerce"
+
+conn_str = "mysql://root:9866@localhost/ecommerce"
 
 
 engine = create_engine(conn_str, echo = True)
