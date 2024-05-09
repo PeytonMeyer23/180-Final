@@ -11,7 +11,13 @@
             <input type="text" name="receiverUserName" placeholder="Vendor Name" class="input_field"> <br>
             <input type="text" name="text" placeholder="Type your message here" class="input_field"> <br>
             <input type="text" name="imageURL" placeholder="Image URL" class="input_field"> <br>
-            <input type="submit" value="Login" class="input_submit">
+            <!-- <input type="submit" value="Login" class="input_submit"> -->
+        {% if error_message %}
+            <div class="error">{{ error_message }}</div>
+        {% endif %}
+        {% if success_message %}
+            <div class="error">{{ success_message }}</div>
+        {% endif %}
         </form>
         <a href="/show_chat">View your messages</a>
     </div>

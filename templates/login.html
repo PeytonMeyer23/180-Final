@@ -15,6 +15,9 @@
         <input type="text" name="input" placeholder="username or email" class="input_field"> <br>
         <input type="text" name="password" placeholder="password" class="input_field"> <br>
         <input type="submit" value="Login" class="input_submit">
+    {% if error_message %}
+        <div class="error">{{ error_message }}</div>
+    {% endif %}
     </form>
 </div>
 
