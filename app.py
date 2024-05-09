@@ -105,7 +105,7 @@ def signout():
         return redirect('login')
     
 
-@app.route('/products')
+@app.route('/products', methods=['GET', 'POST'])
 def products():
     if request.method == 'POST':
         keyword = request.form['q']

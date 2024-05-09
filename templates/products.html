@@ -9,11 +9,14 @@
 <body>
     <div class="section1">
         <h3>Products</h3>
-        <form action="" method="post" id="search-form">
+        <form action="/products" method="post" id="search-form">
             <label for="search-products">Search products:</label>
             <input type="search" id="search-products" name="q" placeholder="Search products...">
             <button type="submit">Search</button>
+            <a href="/products" class="btn btn-secondary">Reset Search</a>
         </form>
+        
+        
     </div>
     
     <div class="container">
