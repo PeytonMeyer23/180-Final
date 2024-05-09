@@ -4,6 +4,8 @@
         <li>Message: {{i[1]}} </li>
         <li>Image: {{i[2]}} </li>
         <li>From: {{i[3]}} </li>
+        <li>To: {{i[4]}} </li>
+
     </ul>
     <form action="/reply" method="POST">
         <input type="hidden" name="receiverUserName" value="{{ i[3] }}">
@@ -12,5 +14,11 @@
         <input type="submit" value="Send" class="input_submit">
     </form>
 {% endfor %}
+{% if success_message %}
+<div class="error">{{ success_message }}</div>
+{% endif %}
+{% if error_message %}
+<div class="error">{{ error_message }}</div>
+{% endif %}
 
 {% endblock %}
