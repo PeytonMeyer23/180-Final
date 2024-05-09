@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 import uuid
+
 app = Flask(__name__)
 
 # conn_str = "mysql://root:CSET@localhost/ecomerce"
@@ -42,8 +43,6 @@ def test_products():
         
         return render_template('index.html', products=products)
 
-if __name__ == '__main__':
-    app.run(debug=True)
 # account functionality
 @app.route('/register.html', methods=['GET','POST'])
 def create_account():
