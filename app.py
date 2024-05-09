@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for,jsonify       
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify       
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
@@ -279,8 +279,8 @@ def send_message():
             receiverUserName = request.form['receiverUserName']
             conn.execute(
     text('INSERT INTO message (writerUserName, receiverUserName, text) VALUES (:current_user, :receiverUserName, :send_to)'),
-    {'current_user': current_user, 'receiverUserName': receiverUserName, 'send_to': send_to}
-)
+    {'current_user': current_user, 'receiverUserName': receiverUserName, 'send_to': send_to}   
+            )
             conn.commit()
             return render_template('show_chat.html')
     else:
