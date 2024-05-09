@@ -235,26 +235,32 @@ def chat():
 def show_chat():
     if request.method == 'GET':
         current_user = session['user']
-        chats = conn.execute(text('SELECT * FROM message WHERE (receiverUserName = :current_user)'), {'current_user': current_user})
+        chats = conn.execute(text('SELECT * FROM message WHERE (receiverUserName = :current_user OR writerUserName = :current_user)'), {'current_user': current_user})
         return render_template('show_chat.html', show_chats=chats)
     return render_template('show_chat.html', show_chats=[])
 
 
 @app.route('/reply', methods=['POST', 'GET'])
 def send_message():
+    error_message = None
+    success_message = None
     if request.method == 'POST':
         if 'user' in session:
             current_user = session['user']
             send_to = request.form['reply']
             receiverUserName = request.form['receiverUserName']
-            conn.execute(
-    text('INSERT INTO message (writerUserName, receiverUserName, text) VALUES (:current_user, :receiverUserName, :send_to)'),
-    {'current_user': current_user, 'receiverUserName': receiverUserName, 'send_to': send_to}
-)
-            conn.commit()
-            return redirect(url_for("chat"))
-    else:
-        return render_template('show_chat.html')
+            if current_user != receiverUserName:
+                conn.execute(
+                    text('INSERT INTO message (writerUserName, receiverUserName, text) VALUES (:current_user, :receiverUserName, :send_to)'),
+                    {'current_user': current_user, 'receiverUserName': receiverUserName, 'send_to': send_to}
+                )
+                conn.commit()
+                success_message = 'Message sent!'
+        else:
+            error_message = 'You cannot reply to yourself.'
+        
+    return render_template("show_chat.html", success_message=success_message, error_message=error_message)
+        
 
 
 @app.route('/add_to_cart', methods=['POST'])
@@ -289,6 +295,36 @@ def add_to_cart():
 
     return 'Product added to cart successfully'
 
+
+@app.route('/update_product', methods=['GET',' POST'])
+def update_product():
+     if request.method == 'POST':
+        if 'user' in session:
+            current_user = session['user']
+            x = request.form['Product ID']
+            name = request.form['Product Name']
+            description = request.form['Description']
+            warranty = request.form['Warranty Period']
+            number = request.form['Number Of Items']
+            price = request.form['Price']
+            imageURL = request.form['Image URL']
+            product = conn.execute(text(f'select * from product where productID = {x}'))
+            conn.execute(text(f"UPDATE product SET title = :name, description = :description, warrantyPeriod = :warranty , numberOfItems = :number , price = :price, imageURL = :imageURL, addedByUserName = :current_user WHERE {x} = productID "), request.form)
+            conn.commit()
+            return render_template('products.html')
+
+
+#delete
+@app.route('/delete_test', methods=["GET", "POST"])
+def delete_boats():
+    if flask.request.method == "POST":
+        conn.execute(text("DELETE FROM tests WHERE test_id = :test_id"), flask.request.form)
+        conn.commit()
+
+        return flask.redirect("/create_test")
+    else:
+        return flask.render_template("delete_test.html")
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
