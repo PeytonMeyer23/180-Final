@@ -5,13 +5,15 @@
 {% endblock %}
 {% block nav %}
 <div class="nav-flex">
-    <a href="/">My Account</a>
-    <a href="/">Log In</a>
+    <a href="/">Home</a>
+    <a href="/login">Log In</a>
 </div>
 {% endblock %}
 {% block body %}
-
-<div class="body">
+<center>
+    <br><br><br><br>    
+    <h1>Register</h1>
+<div class="registerbody">
     <form action="/register" method="POST">
         <input type="text" name="name" placeholder="First and last name" class="input_field"> <br>
         <input type="text" name="email" placeholder="email" class="input_field"> <br>
@@ -25,9 +27,10 @@
             <option value="admin">admin</option>
             </select><br>
         <input type="submit" value="Register" class="input_submit"> 
+        <br><br>
         <!-- a tag is white -->
         <a href="/login">Already have an account? Log in</a>
     </form>
 </div>
-
+</center>
 {% endblock %}

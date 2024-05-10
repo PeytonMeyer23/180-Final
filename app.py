@@ -64,7 +64,7 @@ def create_account():
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return redirect(url_for("/"))
+        return redirect(url_for("login"))
     else:
         return render_template("register.html")
 
@@ -85,9 +85,9 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("chat"))
+                return redirect(url_for("home"))
             elif role == 'user':
-                return redirect(url_for("chat"))
+                return redirect(url_for("home"))
             elif role == 'admin':
                 return redirect(url_for("products"))
         else:
@@ -100,7 +100,7 @@ def login():
 def signout():
     if request.method == 'POST':
         session.clear()
-        return redirect('login')
+        return redirect('signout')
     
 
 @app.route('/products', methods=['GET', 'POST'])
@@ -338,7 +338,9 @@ def delete_product():
     else:
         return render_template("delete_product.html")
     
-
+@app.route('/home')
+def home():
+    return render_template("home.html")
 
 # @app.route('/info', methods=["GET"])
 # def account_info():
