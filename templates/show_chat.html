@@ -1,3 +1,18 @@
+
+{% extends 'base.html' %}
+{% block title%}
+   TITLE
+{% endblock %}
+{% block nav %}
+<div class="nav-flex">
+    <a href="/">Home</a>
+    <a href="/info">My Account</a>
+    <a href="/products">Products</a>
+    <a href="/chat">Chat</a>
+    <a href="/orders">Orders</a>
+    <a href="/login">Sign-out</a>
+</div>
+{% endblock %}
 {% block body %}
 {% for i in show_chats %}
     <ul>
@@ -20,5 +35,6 @@
 {% if error_message %}
 <div class="error">{{ error_message }}</div>
 {% endif %}
+
 
 {% endblock %}

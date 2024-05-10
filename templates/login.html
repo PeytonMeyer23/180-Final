@@ -4,17 +4,21 @@
 {% endblock %}
 {% block nav %}
 <div class="nav-flex">
-    <a href="/">My Account</a>
-    <a href="/">Log In</a>
+    <a href="/">Home</a>
+    <a href="/register">Register</a>
 </div>
 {% endblock %}
 {% block body %}
-
-<div class="body">
+<br><br><br><br>
+<center><h1>Login</h1></center>
+<div class="loginbody">
     <form action="/login" method="POST">
         <input type="text" name="input" placeholder="username or email" class="input_field"> <br>
         <input type="text" name="password" placeholder="password" class="input_field"> <br>
         <input type="submit" value="Login" class="input_submit">
+        <br>
+        <br>
+        <center><a href="/register">Need an account? Register Here</a></center>
     {% if error_message %}
         <div class="error">{{ error_message }}</div>
     {% endif %}
