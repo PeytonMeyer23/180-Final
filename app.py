@@ -43,7 +43,7 @@ def test_products():
 
 
 # account functionality
-@app.route('/register', methods=['GET','POST'])
+@app.route('/register.html', methods=['GET','POST'])
 def create_account():
     if request.method == "POST":
         name = request.form.get('name')
@@ -52,22 +52,23 @@ def create_account():
         email = request.form.get('email')
         accountType = request.form.get('accountType')
         hashed_password = generate_password_hash(password)
-
+        
         cursor = conn.execute(text("SELECT * FROM user WHERE email = :email"), {'email': email})
         existing_user = cursor.fetchone()
         if existing_user:
             error_message = "Email already exists."
             return render_template('register.html', error_message=error_message)
-
+        
         conn.execute(text(
             'INSERT INTO user (name, username, password, email, accountType) VALUES (:name, :username, :password, :email, :accountType)'),
 
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return redirect(url_for("/home.html"))
+        return redirect(url_for("login"))
     else:
         return render_template("register.html")
+
 
 @app.route('/login.html', methods=['GET', 'POST'])
 def login():
@@ -85,9 +86,9 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("chat"))
+                return redirect(url_for("products"))
             elif role == 'user':
-                return redirect(url_for("chat"))
+                return redirect(url_for("products"))
             elif role == 'admin':
                 return redirect(url_for("products"))
         else:
@@ -113,17 +114,19 @@ def products():
     return render_template('products.html', products=products)
 
 
-# @app.route('/products_test')
-# def test_products():
-#     products = conn.execute(
-#         text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
-#              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
-#     ).fetchall()
+@app.route('/products_test')
+def test_products():
+    products = conn.execute(
+        text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
+             "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
+    ).fetchall()
     
-#     return render_template('product_page_test.html', products=products)
+    return render_template('product_page_test.html', products=products)
+
+
 
 @app.route('/addproducts', methods=['GET'])
-def add_products():
+def add_products  ():
     return render_template('addproduct.html')
 
 
@@ -162,8 +165,6 @@ def create_product():
 
     conn.commit()
     return render_template('products.html')
-
-
 @app.route('/order', methods=['GET'])
 def MakeOrder(user, cart_items):
 
@@ -181,7 +182,8 @@ def MakeOrder(user, cart_items):
         {'date': order_date, 'status': status, 'placedByUserName': placed_by_username}
     )
     
-
+    
+    
 
 # @app.route('/cart', methods=['POST'])
 # def AddCart():
@@ -193,12 +195,12 @@ def MakeOrder(user, cart_items):
 #         return render_template('cart.html')
 
 
-
 # # vendor
 # @app.route('/products')
 # def get_products():
 #     products = conn.execute(text("SELECT * FROM product")).fetchall()
 #     return render_template("products.html", products=products)
+
 
 
 # filter
@@ -250,4 +252,4 @@ def show_chat():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)NB\
