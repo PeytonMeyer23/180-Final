@@ -296,34 +296,47 @@ def add_to_cart():
     return 'Product added to cart successfully'
 
 
-@app.route('/update_product', methods=['GET',' POST'])
+@app.route('/update_product', methods=['GET', 'POST'])
 def update_product():
-     if request.method == 'POST':
+    if request.method == 'POST':
         if 'user' in session:
             current_user = session['user']
-            x = request.form['Product ID']
-            name = request.form['Product Name']
+            x = request.form['ProductID']
+            name = request.form['ProductName']
             description = request.form['Description']
-            warranty = request.form['Warranty Period']
-            number = request.form['Number Of Items']
+            warranty = request.form['WarrantyPeriod']
+            number = request.form['NumberOfItems']
             price = request.form['Price']
-            imageURL = request.form['Image URL']
-            product = conn.execute(text(f'select * from product where productID = {x}'))
-            conn.execute(text(f"UPDATE product SET title = :name, description = :description, warrantyPeriod = :warranty , numberOfItems = :number , price = :price, imageURL = :imageURL, addedByUserName = :current_user WHERE {x} = productID "), request.form)
+            imageURL = request.form['ImageURL']
+            product = conn.execute(text(f'SELECT * FROM product WHERE productID = {x}'))
+            conn.execute(
+                text("UPDATE product SET title = :name, description = :description, warrantyPeriod = :warranty, numberOfItems = :number, price = :price, addedByUserName = :current_user WHERE productID = :x"),
+                {'name': name, 'description': description, 'warranty': warranty, 'number': number, 'price': price, 'current_user': current_user, 'x': x}
+            )
+            conn.execute(
+                text("UPDATE productimages SET imageURL = :imageURL WHERE productID = :x"),
+                {'imageURL': imageURL, 'x': x}
+            )
             conn.commit()
             return render_template('update_product.html')
+    else:
+        return render_template('update_product.html')
 
+
+        
 
 #delete
-@app.route('/delete_test', methods=["GET", "POST"])
-def delete_boats():
-    if flask.request.method == "POST":
-        conn.execute(text("DELETE FROM tests WHERE test_id = :test_id"), flask.request.form)
+@app.route('/delete_product', methods=["GET", "POST"])
+def delete_product():
+    if request.method == "POST":
+        productID = request.form['productID']
+        conn.execute(text("DELETE FROM productimages WHERE productID = :productID"), {'productID': productID})
+        conn.execute(text("DELETE FROM product WHERE productID = :productID"), {'productID': productID})
         conn.commit()
 
-        return flask.redirect("/create_test")
+        return redirect(url_for("delete_product"))
     else:
-        return flask.render_template("delete_test.html")
+        return render_template("delete_product.html")
     
 @app.route('/home')
 def home():
