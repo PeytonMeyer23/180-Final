@@ -1,0 +1,29 @@
+ <link rel="stylesheet" href="../static/accstyles.css">
+
+{% extends 'base.html' %}
+{% block title%}
+   Account Info
+{% endblock %}
+{% block nav %}
+<div class="nav-flex">
+    <a href="/">Home</a>
+    <a href="/info">My Account</a>
+    <a href="/products">Products</a>
+    <a href="/chat">Chat</a>
+    <a href="/orders">Orders</a>
+    <a href="/login">Sign-out</a>
+</div>
+{% endblock %}
+{% block body %}
+ <center><h3>Account Info</h3></center> 
+
+
+<div class="account_info">
+    <h2>Username: {{ user[0] }}</h2>
+    <br>
+    <p>Name: {{ user[1] }}</p>
+    <p>Email Address: {{ user[2] }}</p>
+    <p>Account Type: {{ user[4] }}</p>
+</div>
+
+{% endblock %}
