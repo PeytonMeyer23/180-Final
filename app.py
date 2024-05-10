@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect, session, url_for,jsonify       
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify       
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
 import uuid
 from datetime import datetime
 
 app = Flask(__name__)
-conn_str = "mysql://root:cset155@localhost/ecommerce"
+# conn_str = "mysql://root:CSET@localhost/ecomerce"
+
+conn_str = "mysql://root:9866@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
@@ -62,7 +64,7 @@ def create_account():
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return redirect(url_for("/home.html"))
+        return redirect(url_for("/"))
     else:
         return render_template("register.html")
 
@@ -99,9 +101,9 @@ def signout():
     if request.method == 'POST':
         session.clear()
         return redirect('login')
+    
 
-
-@app.route('/products')
+@app.route('/products', methods=['GET', 'POST'])
 def products():
     if request.method == 'POST':
         keyword = request.form['q']
@@ -131,13 +133,14 @@ def test_products2():
              "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
     ).fetchall()
     
-    return render_template('product_page_test.html', products=products)
+#     return render_template('product_page_test.html', products=products)
+
+
 
 
 @app.route('/addproducts', methods=['GET'])
 def add_products():
     return render_template('addproduct.html')
-
 
 @app.route('/addproducts', methods=['POST'])
 def create_product():
@@ -147,7 +150,7 @@ def create_product():
     warranty_period = request.form.get('Warranty Period')
     number_of_items = request.form.get('Number Of Items')
     price = request.form.get('Price')
-    image_urls = request.form.getlist('Image URL')  
+    image_urls = request.form.getlist('Image URL')
 
     conn.execute(
         text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
@@ -161,19 +164,16 @@ def create_product():
             'price': price
         }
     )
-    
-  
-    for url in image_urls:
-        conn.execute(
-            text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
-            {
-                'productID': product_id,
-                'imageURL': url
-            }
-        )
+
+    # Insert all image URLs at once
+    conn.execute(
+        text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
+        [{'productID': product_id, 'imageURL': url} for url in image_urls]
+    )
 
     conn.commit()
     return render_template('products.html')
+
 
 
 @app.route('/order', methods=['GET'])
@@ -322,6 +322,7 @@ def update_product():
     else:
         return render_template('update_product.html')
 
+
         
 
 #delete
@@ -337,6 +338,35 @@ def delete_product():
     else:
         return render_template("delete_product.html")
     
+
+
+# @app.route('/info', methods=["GET"])
+# def account_info():
+#     if request.method == "GET":
+#         user = session['user']
+#         result = conn.execute(text("SELECT * FROM user WHERE userName = :user"), {'user': user})
+#         accounts = [dict(row) for row in result]
+#         return render_template("account_info.html", result=accounts)
+#     return render_template("account_info.html", accounts=[])
+
+
+
+@app.route('/info', methods=['POST', 'GET'])
+def account_info():
+    if 'user' not in session:
+        # Handle this case appropriately, redirect to login maybe
+        return "User not logged in."
+
+    if request.method == 'GET':
+        current_user = session['user']
+        result = conn.execute(text("SELECT * FROM user WHERE userName = :user"), {'user': current_user}).fetchall()
+        if not result:
+            return "No user found"
+        return render_template('account_info.html', user=result[0])
+    
+    return render_template('account_info.html', user={})  # Empty user in case of POST request
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+   }
+   
+
+.account_info{
+    padding-left: 10px;
+    font-size: 50px;
+}
+   
+   main {
+    padding: 2rem;
+   }
+   
+   section {
+    margin-bottom: 1rem;
+   }
+   
+   section h2 {
+    margin-bottom: 0.5rem;
+   }
+
+h3 {
+    font-size: 55px;
+}
