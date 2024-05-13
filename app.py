@@ -64,7 +64,7 @@ def create_account():
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return redirect(url_for("/login"))
+        return redirect(url_for("login"))
     else:
         return render_template("register.html")
 
@@ -85,11 +85,11 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("products"))
+                return redirect(url_for("dashboard"))
             elif role == 'user':
                 return redirect(url_for("products"))
             elif role == 'admin':
-                return redirect(url_for("products"))
+                return redirect(url_for("dashboard"))
         else:
             error_message = "Invalid username/email or password"
             return render_template('login.html', error_message=error_message)
@@ -100,7 +100,7 @@ def login():
 def signout():
     if request.method == 'POST':
         session.clear()
-        return redirect('login')
+        return redirect('signout')
     
 
 @app.route('/products', methods=['GET', 'POST'])
@@ -345,6 +345,21 @@ def delete_product():
     else:
         return render_template("delete_product.html")
     
+
+@app.route('/home')
+def home():
+    return render_template("home.html")
+
+# @app.route('/info', methods=["GET"])
+# def account_info():
+#     if request.method == "GET":
+#         user = session['user']
+#         result = conn.execute(text("SELECT * FROM user WHERE userName = :user"), {'user': user})
+#         accounts = [dict(row) for row in result]
+#         return render_template("account_info.html", result=accounts)
+#     return render_template("account_info.html", accounts=[])
+
+
 
 @app.route('/info', methods=['POST', 'GET'])
 def account_info():
