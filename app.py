@@ -2,12 +2,12 @@ from flask import Flask, render_template, request, redirect, session, url_for, j
 from sqlalchemy import create_engine, text
 from werkzeug.security import check_password_hash, generate_password_hash
 import uuid
-from datetime import datetime
+import datetime
 
 app = Flask(__name__)
-# conn_str = "mysql://root:CSET@localhost/ecomerce"
+conn_str = "mysql://root:cset155@localhost/ecommerce"
 
-conn_str = "mysql://root:9866@localhost/ecommerce"
+conn_str = "mysql://root:cset155@localhost/ecommerce"
 engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
@@ -64,7 +64,7 @@ def create_account():
             {'name': name, 'username': username, 'email': email, 'password': hashed_password, 'accountType': accountType})
 
         conn.commit()
-        return redirect(url_for("/"))
+        return redirect(url_for("/login"))
     else:
         return render_template("register.html")
 
@@ -85,9 +85,9 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("chat"))
+                return redirect(url_for("products"))
             elif role == 'user':
-                return redirect(url_for("chat"))
+                return redirect(url_for("products"))
             elif role == 'admin':
                 return redirect(url_for("products"))
         else:
@@ -117,7 +117,18 @@ def products():
                  "FROM product p LEFT JOIN productimages pi ON p.productID = pi.productID")
         ).fetchall()
 
-    return render_template('products.html', products=products)
+        sort = request.form.get('sort', 'date')
+
+        if sort == 'date':
+            reviews = conn.execute(
+                text("SELECT * FROM review ORDER BY date DESC")
+            ).fetchall()
+        elif sort == 'rating':
+            reviews = conn.execute(
+                text("SELECT * FROM review ORDER BY rating DESC")
+            ).fetchall()
+
+    return render_template('products.html', products=products, reviews=reviews)
 
 
 @app.route('/update-cart', methods=['POST'])
@@ -262,7 +273,6 @@ def send_message():
     return render_template("show_chat.html", success_message=success_message, error_message=error_message)
         
 
-
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
     product_id = request.form.get('productID')
@@ -322,9 +332,6 @@ def update_product():
     else:
         return render_template('update_product.html')
 
-
-        
-
 #delete
 @app.route('/delete_product', methods=["GET", "POST"])
 def delete_product():
@@ -338,18 +345,6 @@ def delete_product():
     else:
         return render_template("delete_product.html")
     
-
-
-# @app.route('/info', methods=["GET"])
-# def account_info():
-#     if request.method == "GET":
-#         user = session['user']
-#         result = conn.execute(text("SELECT * FROM user WHERE userName = :user"), {'user': user})
-#         accounts = [dict(row) for row in result]
-#         return render_template("account_info.html", result=accounts)
-#     return render_template("account_info.html", accounts=[])
-
-
 
 @app.route('/info', methods=['POST', 'GET'])
 def account_info():
@@ -366,6 +361,34 @@ def account_info():
     
     return render_template('account_info.html', user={})  # Empty user in case of POST request
 
+
+@app.route('/review', methods=['POST', 'GET'])
+def review():
+    if 'user' in session:
+        if request.method == 'POST':
+            reviewUserName = session['user']
+            rating = request.form['rating']
+            description = request.form['desc']
+            img = request.form['img']
+            date = datetime.datetime.now().strftime("%Y-%m-%d")
+            conn.execute(
+                text("insert into review (rating, description, img, date, reviewUserName) VALUES "
+                     "(:rating, :description, :img, :date, :reviewUserName)"),
+                {
+                    'rating': rating,
+                    'description': description,
+                    'img': img,
+                    'date': date,
+                    'reviewUserName': reviewUserName
+                }
+            )
+            conn.commit()
+
+        return render_template('review.html')
+    else:
+        return redirect(url_for('login'))
+
+    
 
 
 if __name__ == '__main__':
