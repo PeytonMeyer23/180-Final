@@ -147,13 +147,13 @@ def test_products2():
 #     return render_template('product_page_test.html', products=products)
 
 
-@app.route('/addproduct', methods=['GET'])
+@app.route('/addproducts', methods=['GET'])
 def add_products():
     return render_template('addproduct.html')
 
-
-@app.route('/addproduct', methods=['POST'])
+@app.route('/addproducts', methods=['POST'])
 def create_product():
+    product_id = request.form.get('Product ID')
     title = request.form.get('Product Name')
     description = request.form.get('Description')
     warranty_period = request.form.get('Warranty Period')
@@ -162,9 +162,10 @@ def create_product():
     image_urls = request.form.getlist('Image URL')
 
     conn.execute(
-        text("INSERT INTO product (title, description, warrantyPeriod, numberOfItems, price) VALUES "
-             "(:title, :description, :warrantyPeriod, :numberOfItems, :price)"),
+        text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
+             "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
         {
+            'productID': product_id,
             'title': title,
             'description': description,
             'warrantyPeriod': warranty_period,
@@ -175,12 +176,12 @@ def create_product():
 
     # Insert all image URLs at once
     conn.execute(
-        text("INSERT INTO productimages (imageURL) VALUES (:imageURL)"),
-        [{'imageURL': url} for url in image_urls]
+        text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
+        [{'productID': product_id, 'imageURL': url} for url in image_urls]
     )
 
     conn.commit()
-    return render_template('products.html')
+    return redirect(url_for("products"))
 
 
 @app.route('/order', methods=['GET'])
