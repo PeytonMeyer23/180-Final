@@ -15,6 +15,33 @@
     height: auto;
 }
 
+.review {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid black;
+}
+
+.review img {
+    width: 100px; 
+    margin-right: 10px;
+}
+
+.review p {
+    margin: 0;
+    padding: 20px;
+}
+
+.review:last-child {
+    border-bottom: none; 
+}
+
+.image {
+    max-width: 500px;
+    max-height: 500px;
+}
+
 .product-details-box {
     position: fixed;
     top: 0;
