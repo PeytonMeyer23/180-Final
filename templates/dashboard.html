@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title%}
+   TITLE
+{% endblock %}
+{% block nav %}
+<div class="nav-flex">
+    <a href="/">Home</a>
+    <a href="/info">My Account</a>
+    <a href="/update_product">Edit Products</a>
+    <a href="/add_product">Add Products</a>
+    <a href="/delete_product">Remove Products</a>
+    <a href="/chat">Chat</a>
+    <a href="/login">Sign-out</a>
+</div>
+{% endblock %}
+{% block body %}
+  <style>
+   .btest{
+      display: block;
+      justify-content: center;
+      align-items: center;
+      height: 500px;
+      font-family: Arial, sans-serif;
+    }
+
+  .container {
+      text-align: center;
+    }
+
+    .container h1 {
+      font-size: 5rem;
+      margin-bottom: 0;
+    }
+
+    p {
+      font-size: 2rem;
+      margin-top: 0;
+    }
+
+   .content {
+      margin-top: 5rem;
+      display: flex;
+      justify-content: space-around;
+      width: 80%;
+    }
+
+   .card {
+      width: 30%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+   .card h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<div class="btest">
+  <div class="container">
+    <br>
+    <strong>    <p>Welcome: {{ user[1] }}</p></strong>
+
+     <br>
+    <p>We're glad you're here.</p>
+  </div>
+<center>
+  <div class="content">
+    <div class="card">
+      <h2>Weekly Bulletin 1</h2>
+      <p>If you are threatend by a customer through the chat please report them to your supervisor and do not send them death threats.</p>
+    </div>
+    <div class="card">
+      <h2>Birthdays This Week</h2>
+      <p>Xavier Shefcyk</p>
+      <p>Dylan Zook</p>
+      <p>Israel Fernandez</p>
+      <p>Kodee Kong</p>
+      <p>Don't party too hard guys!</p>
+    </div>
+    <div class="card">
+      <h2>Safety Tip Of the Day</h2>
+      <p>If you see a dangerous item in the system tell someone we don't want a repeat of last time...</p>
+    </div>
+  </div>
+</center>
+</div>
+{% endblock %}

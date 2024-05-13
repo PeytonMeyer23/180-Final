@@ -85,11 +85,11 @@ def login():
             session['username_or_email'] = username_or_email
             session['role'] = role
             if role == 'vendor':
-                return redirect(url_for("home"))
+                return redirect(url_for("dashboard"))
             elif role == 'user':
                 return redirect(url_for("home"))
             elif role == 'admin':
-                return redirect(url_for("products"))
+                return redirect(url_for("dashboard"))
         else:
             error_message = "Invalid username/email or password"
             return render_template('login.html', error_message=error_message)
@@ -342,6 +342,23 @@ def delete_product():
 def home():
     return render_template("home.html")
 
+    
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session:
+        return "User not logged in."
+
+    if request.method == 'GET':
+        current_user = session['user']
+        result = conn.execute(text("SELECT * FROM user WHERE userName = :user"), {'user': current_user}).fetchall()
+        if not result:
+            return "No user found"
+        return render_template('dashboard.html', user=result[0])
+    
+    return render_template('dashboard.html', user={})  
+
+
+
 # @app.route('/info', methods=["GET"])
 # def account_info():
 #     if request.method == "GET":
@@ -356,7 +373,6 @@ def home():
 @app.route('/info', methods=['POST', 'GET'])
 def account_info():
     if 'user' not in session:
-        # Handle this case appropriately, redirect to login maybe
         return "User not logged in."
 
     if request.method == 'GET':
@@ -366,8 +382,7 @@ def account_info():
             return "No user found"
         return render_template('account_info.html', user=result[0])
     
-    return render_template('account_info.html', user={})  # Empty user in case of POST request
-
+    return render_template('account_info.html', user={})  
 
 
 if __name__ == '__main__':
