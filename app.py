@@ -12,7 +12,7 @@ engine = create_engine(conn_str, echo = True)
 conn = engine.connect()
 app.secret_key = 'hello'
 
-
+#------------------------------------------------------HOME PAGE NOT LOGGED IN----------------------------------------
 @app.route('/', methods=['GET', 'POST'])
 def test_products():
     if request.method == 'POST':
@@ -22,7 +22,7 @@ def test_products():
         size = cart_data['size']
         color = cart_data['color']
         
-        # Insert the cart item into the database
+
         conn.execute(
             text("INSERT INTO carthasproduct (cartID, productID, size, color) VALUES (:cart_id, :product_id, :size, :color)"),
             cart_id=cart_id,
@@ -40,8 +40,7 @@ def test_products():
         ).fetchall()
         
         return render_template('index.html', products=products)
-
-# account functionality
+#------------------------------------------------------ACCOUNT FUNCTIONALITY----------------------------------------
 @app.route('/register', methods=['GET','POST'])
 def create_account():
     if request.method == "POST":
@@ -102,7 +101,7 @@ def signout():
         session.clear()
         return redirect('signout')
     
-
+#------------------------------------------------------PRODUCT----------------------------------------
 @app.route('/products', methods=['GET', 'POST'])
 def products():
     if request.method == 'POST':
@@ -131,12 +130,7 @@ def products():
     return render_template('products.html', products=products, reviews=reviews)
 
 
-@app.route('/update-cart', methods=['POST'])
-def update_cart():
-    cart_data = request.get_json()
-    cartID = cart_data['cartID']
-
-
+#------------------------------------------------------PRODUCT TEST----------------------------------------
 @app.route('/products_test')
 def test_products2():
     products = conn.execute(
@@ -147,7 +141,11 @@ def test_products2():
 #     return render_template('product_page_test.html', products=products)
 
 
-@app.route('/addproduct', methods=['GET'])
+
+#------------------------------------------------------ADD PRODUCT----------------------------------------
+
+@app.route('/addproducts', methods=['GET'])
+
 def add_products():
     return render_template('addproduct.html')
 
@@ -173,15 +171,15 @@ def create_product():
         }
     )
 
-    # Insert all image URLs at once
     conn.execute(
         text("INSERT INTO productimages (imageURL) VALUES (:imageURL)"),
         [{'imageURL': url} for url in image_urls]
     )
 
     conn.commit()
-    return render_template('products.html')
+    return redirect(url_for("products"))
 
+#------------------------------------------------------ORDER----------------------------------------
 
 @app.route('/order', methods=['GET'])
 def MakeOrder(user, cart_items):
@@ -200,7 +198,7 @@ def MakeOrder(user, cart_items):
         {'date': order_date, 'status': status, 'placedByUserName': placed_by_username}
     )
 
-# chat
+#------------------------------------------------------CHAT----------------------------------------
 @app.route('/chat', methods=['POST', 'GET'])
 def chat():
     error_message = None
@@ -219,7 +217,6 @@ def chat():
                 if result:
                     vendor_username = result[0]
 
-            # insert message into SQL
                 conn.execute(
                     text("INSERT INTO message (text, imageURL, writerUserName, receiverUserName) VALUES "
                          "(:text, :imageURL, :writerUserName, :receiverUserName)"),
@@ -267,7 +264,9 @@ def send_message():
             error_message = 'You cannot reply to yourself.'
         
     return render_template("show_chat.html", success_message=success_message, error_message=error_message)
-        
+
+#------------------------------------------------------CART----------------------------------------
+
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
@@ -301,6 +300,14 @@ def add_to_cart():
 
     return 'Product added to cart successfully'
 
+@app.route('/update-cart', methods=['POST'])
+def update_cart():
+    cart_data = request.get_json()
+    cartID = cart_data['cartID']
+
+
+
+#------------------------------------------------------UPDATE PRODUCT----------------------------------------
 
 @app.route('/update_product', methods=['GET', 'POST'])
 def update_product():
@@ -328,7 +335,8 @@ def update_product():
     else:
         return render_template('update_product.html')
 
-#delete
+#------------------------------------------------------DELETE PRODUCT----------------------------------------
+
 @app.route('/delete_product', methods=["GET", "POST"])
 def delete_product():
     if request.method == "POST":
@@ -340,13 +348,16 @@ def delete_product():
         return redirect(url_for("delete_product"))
     else:
         return render_template("delete_product.html")
-    
+
+#------------------------------------------------------HOME LOGGED IN----------------------------------------
+
 
 @app.route('/home')
 def home():
     return render_template("home.html")
 
-    
+#------------------------------------------------------VENDOR/ADMIN DASHBOARD----------------------------------------
+   
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session:
@@ -362,17 +373,7 @@ def dashboard():
     return render_template('dashboard.html', user={})  
 
 
-
-# @app.route('/info', methods=["GET"])
-# def account_info():
-#     if request.method == "GET":
-#         user = session['user']
-#         result = conn.execute(text("SELECT * FROM user WHERE userName = :user"), {'user': user})
-#         accounts = [dict(row) for row in result]
-#         return render_template("account_info.html", result=accounts)
-#     return render_template("account_info.html", accounts=[])
-
-
+#------------------------------------------------------ACCOUNT INFO----------------------------------------
 
 @app.route('/info', methods=['POST', 'GET'])
 def account_info():
