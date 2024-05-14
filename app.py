@@ -141,15 +141,17 @@ def test_products2():
 #     return render_template('product_page_test.html', products=products)
 
 
+
 #------------------------------------------------------ADD PRODUCT----------------------------------------
 
 @app.route('/addproducts', methods=['GET'])
+
 def add_products():
     return render_template('addproduct.html')
 
-@app.route('/addproducts', methods=['POST'])
+
+@app.route('/addproduct', methods=['POST'])
 def create_product():
-    product_id = request.form.get('Product ID')
     title = request.form.get('Product Name')
     description = request.form.get('Description')
     warranty_period = request.form.get('Warranty Period')
@@ -158,10 +160,9 @@ def create_product():
     image_urls = request.form.getlist('Image URL')
 
     conn.execute(
-        text("INSERT INTO product (productID, title, description, warrantyPeriod, numberOfItems, price) VALUES "
-             "(:productID, :title, :description, :warrantyPeriod, :numberOfItems, :price)"),
+        text("INSERT INTO product (title, description, warrantyPeriod, numberOfItems, price) VALUES "
+             "(:title, :description, :warrantyPeriod, :numberOfItems, :price)"),
         {
-            'productID': product_id,
             'title': title,
             'description': description,
             'warrantyPeriod': warranty_period,
@@ -171,8 +172,8 @@ def create_product():
     )
 
     conn.execute(
-        text("INSERT INTO productimages (productID, imageURL) VALUES (:productID, :imageURL)"),
-        [{'productID': product_id, 'imageURL': url} for url in image_urls]
+        text("INSERT INTO productimages (imageURL) VALUES (:imageURL)"),
+        [{'imageURL': url} for url in image_urls]
     )
 
     conn.commit()
@@ -263,11 +264,9 @@ def send_message():
             error_message = 'You cannot reply to yourself.'
         
     return render_template("show_chat.html", success_message=success_message, error_message=error_message)
-        
-<<<<<<< HEAD
+
 #------------------------------------------------------CART----------------------------------------
-=======
->>>>>>> facf3580b1966cc4e147fb0443361b33ad6b0207
+
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
@@ -336,13 +335,8 @@ def update_product():
     else:
         return render_template('update_product.html')
 
-<<<<<<< HEAD
-
 #------------------------------------------------------DELETE PRODUCT----------------------------------------
 
-=======
-#delete
->>>>>>> facf3580b1966cc4e147fb0443361b33ad6b0207
 @app.route('/delete_product', methods=["GET", "POST"])
 def delete_product():
     if request.method == "POST":
@@ -354,12 +348,9 @@ def delete_product():
         return redirect(url_for("delete_product"))
     else:
         return render_template("delete_product.html")
-<<<<<<< HEAD
 
 #------------------------------------------------------HOME LOGGED IN----------------------------------------
-=======
-    
->>>>>>> facf3580b1966cc4e147fb0443361b33ad6b0207
+
 
 @app.route('/home')
 def home():
@@ -425,7 +416,5 @@ def review():
         return redirect(url_for('login'))
 
     
-
-
 if __name__ == '__main__':
     app.run(debug=True)
