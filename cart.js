@@ -64,22 +64,22 @@ function ready(){
         updateCart()
     }
     
-    function addItemToCart(title, price) {
+    function addItemToCart(title, price){
         var cartRow = document.createElement('div')
         cartRow.classList.add('cart-row')
         var cartItems = document.getElementsByClassName('cart-items')[0]
         var cartItemNames = cartItems.getElementsByClassName('title')
-        for (var i = 0; i < cartItemNames.length; i++) {
-            if (cartItemNames[i].innerText == title) {
+        for (var i =0; i < cartItemNames.length; i++) {
+            if( cartItemNames[i].innerText == title){
                 alert('Already added to cart')
                 return
             }
         }
         var cartRowContents = `
             <div class="cart-item cart-column">
-                <span class="title" id='title'>${title}</span>
+                <span class="title" id='title' >${title}</span>
             </div>
-            <span class="cart-price cart-column" id='cart-price'>${price}</span>
+            <span class="cart-price cart-column" id='cart-price' >${price}</span>
             <div class="cart-quantity cart-column">
                 <input class="cart-quantity-input" type="number" value="1">
                 <button class="btn btn-danger" type="button">REMOVE</button>
@@ -87,23 +87,11 @@ function ready(){
         cartRow.innerHTML = cartRowContents
         cartItems.append(cartRow)
         cartRow.getElementsByClassName('btn-danger')[0].addEventListener('click', removeItem)
-        cartRow.getElementsByClassName('cart-quantity-input')[0].addEventListener('change', quantityChanged)
-    
-        // Send an AJAX request to insert the item into the cart table
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/add_to_cart', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                console.log('Item added to cart:', xhr.responseText);
-                updateCart();
-            } else {
-                console.error('Failed to add item to cart:', xhr.responseText);
-            }
-        };
-        xhr.send(JSON.stringify({ title: title, price: price }));
+        cartRow.getElementsByClassName('cart-quantity-input')[0].addEventListener('change' , quantityChanged)
+
     }
     
+    document.getElementsByClassName('btn-purchase')[0].addEventListener('click', purchaseClicked)
     
     function purchaseClicked(){
 

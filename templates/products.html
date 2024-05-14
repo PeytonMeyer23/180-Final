@@ -83,6 +83,8 @@
         }
     }
 </script>
+
+
 <script>
     function showProductDetails(product) {
         var productDetailsBox = document.getElementById("product-details-box");
@@ -106,6 +108,8 @@
         var productDescription = document.createElement("div");
         productDescription.innerHTML = "<strong>Description:</strong> " + product.description;
         productDetails.appendChild(productDescription);
+        
+
         
         var addToCartBtn = document.createElement("button");
         addToCartBtn.className = "add-to-cart-btn";
@@ -137,4 +141,5 @@
     }
 </script>
 
+<script src="cart.js"></script>
 {% endblock %}

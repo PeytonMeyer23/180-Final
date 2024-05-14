@@ -1,3 +1,18 @@
+{% extends 'base.html' %}
+{% block title%}
+   TITLE
+{% endblock %}
+{% block nav %}
+<div class="nav-flex">
+     <a href="/home">Home</a>
+    <a href="/info">My Account</a>
+    <a href="/products">Products</a>
+    <a href="/chat">Chat</a>
+    <a href="/orders">Orders</a>
+    <a href="/login">Sign-out</a>
+</div>
+{% endblock %}
+{% block body %}
 <div class="body">
     <form action="/review" method="POST">
         <input type="text" name="desc" placeholder="Description" class="input_field"> <br>
@@ -14,3 +29,4 @@
     </form>
 </div>
 </div>
+{% endblock %}
