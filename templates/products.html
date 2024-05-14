@@ -46,9 +46,19 @@
 
 </div>
 
-
-
-
+<select name="sort" id="sort">
+    <option>Sort</option>
+    <option value="byDate">By Date</option>
+    <option value="byRating">By Rating (descending)</option>
+</select><br>
+{% for review in reviews %}
+<div class="review">
+    <img src="{{ review['img'] }}" alt="Product Image" class="image">
+    <p><strong>  Rating:</strong> {{ review.rating }}</p>
+    <p><strong>  Description:</strong> {{ review.description }}</p>
+    <p><strong>  Date:</strong> {{ review.date }}</p>
+</div>
+{% endfor %}
 
 <script>
     function showProductDetails(product) {
