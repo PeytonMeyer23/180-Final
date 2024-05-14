@@ -105,6 +105,7 @@ def signout():
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():
+    reviews = []
     if request.method == 'POST':
         keyword = request.form['q']
         query = text("SELECT p.productID, p.title, p.description, p.warrantyPeriod, p.numberOfItems, p.price, pi.imageURL "
